@@ -1,5 +1,30 @@
+import { NAV_ITEMS } from "./constants";
+import Link from "next/link";
+import Image from "next/image";
+import { Flex } from "antd";
 import styles from "./page.module.css";
 
 export default function Home() {
-  return <main>test</main>;
+  return (
+    <main className={styles.main}>
+      <Flex className={styles.banner} gap={50}>
+        <Flex vertical>
+          <h2>Ближайшие доставки</h2>
+          <p>МСК и ОБЛ: 25.02.26</p>
+          <p>СПБ и ОБЛ: 29.02.26</p>
+        </Flex>
+        <Flex vertical>
+          <h2>Предложение месяца</h2>
+        </Flex>
+      </Flex>
+      <div className={styles.categoryList}>
+        {NAV_ITEMS.map((item) => (
+          <Link className={styles.categoryItem} key={item.id} href={item.link}>
+            <Image src={item?.img} width={160} height={160} alt="" />
+            <span>{item.name}</span>
+          </Link>
+        ))}
+      </div>
+    </main>
+  );
 }

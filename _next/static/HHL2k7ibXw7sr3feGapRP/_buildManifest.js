@@ -1,7 +1,12 @@
 self.__BUILD_MANIFEST = {
   "__rewrites": {
     "afterFiles": [],
-    "beforeFiles": [],
+    "beforeFiles": [
+      {
+        "source": "/tili-mili//_next/:path+",
+        "destination": "/tili-mili/_next/:path+"
+      }
+    ],
     "fallback": []
   },
   "sortedPages": [

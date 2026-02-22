@@ -7,6 +7,11 @@
   box-sizing: border-box;
   overflow: hidden;
   font-family: var(--font-family);
+
+  .slogan {
+    margin-top: 10px;
+    color: #d6a652;
+  }
 }
 
 .fullWidth {
@@ -31,7 +36,7 @@
   flex-direction: column;
   justify-content: center;
   width: 100%;
-  max-width: 1800px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 10px 50px;
 

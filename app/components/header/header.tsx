@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import classnames from "classnames";
 import styles from "./styles.module.css";
-import { Flex, Typography, Button } from "antd";
+import { Flex, Typography, Button, Input } from "antd";
 import { DeliveryIcon } from "../icons/delivery";
 import { HEADER_IMG_PATHS } from "./constants";
 import {
@@ -64,7 +64,7 @@ export const Header = () => {
               height={200}
               alt="TILI-MILI"
             />
-            <Typography.Title level={3}>
+            <Typography.Title className={styles.slogan} level={2}>
               Вкусные продукты из деревни с чистым составом
             </Typography.Title>
           </Flex>
@@ -97,6 +97,19 @@ export const Header = () => {
           </Link>
         ))}
       </Flex>
+
+      <div className={styles.container}>
+        <Input.Search
+          placeholder="Что вы хотите найти"
+          onSearch={() => {}}
+          enterButton
+          styles={{
+            button: { root: { backgroundColor: "#607d83" } },
+            input: { borderColor: "#607d83", color: "#607d83" },
+            root: { width: "70%", marginTop: "30px" },
+          }}
+        />
+      </div>
 
       {menuOpen && <div className={styles.overlay} onClick={toggleMenu} />}
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import classnames from "classnames";
 import styles from "./styles.module.css";
-import { Flex, Typography, Button, Input } from "antd";
+import { Flex, Typography, Button, Input, Dropdown } from "antd";
 import { DeliveryIcon } from "../icons/delivery";
 import { HEADER_IMG_PATHS } from "./constants";
 import {
@@ -48,13 +48,15 @@ export const Header = () => {
         >
           <a className={styles.phone} href="tel:8800">
             <Button
-              classNames={{ icon: classnames(styles.cargoIcon) }}
+              classNames={{ icon: classnames(styles.phone) }}
               variant="text"
               type="text"
               size="large"
               icon={<PhoneOutlined />}
             />
-            <Typography.Text>{"+7(916)-367-28-25"}</Typography.Text>
+            <Typography.Text className={styles.phoneText}>
+              {"+7(916)-367-28-25"}
+            </Typography.Text>
           </a>
           <Flex vertical align="center">
             <Image
@@ -64,11 +66,8 @@ export const Header = () => {
               height={200}
               alt="TILI-MILI"
             />
-            <Typography.Title className={styles.slogan} level={2}>
-              Вкусные продукты из деревни с чистым составом
-            </Typography.Title>
           </Flex>
-          <Flex gap={12} align="center">
+          <Flex align="center" className={styles.rightIcons}>
             <Button
               classNames={{ icon: classnames(styles.cartIcon) }}
               variant="text"
@@ -84,19 +83,39 @@ export const Header = () => {
               icon={<DeliveryIcon />}
             />
           </Flex>
-          <button className={styles.burgerBtn} onClick={toggleMenu}>
-            <MenuOutlined />
-          </button>
         </Flex>
+        <Typography.Title className={styles.slogan} level={2}>
+          Вкусные продукты из деревни с чистым составом
+        </Typography.Title>
       </div>
 
-      <Flex justify="center" className={styles.navbar} gap={20}>
+      <Flex justify="center" className={styles.navbarDesktop} gap={20}>
         {NAV_ITEMS.map((item) => (
-          <Link className={styles.navbarItem} key={item.id} href={item.link}>
-            {item.name}
-          </Link>
+          <Dropdown
+            key={item.id}
+            menu={{
+              items: item.subCategories.map((subCategory) => ({
+                key: subCategory.id.toString(),
+                label: <Link href="/">{subCategory.label}</Link>,
+              })),
+            }}
+          >
+            <Link className={styles.navbarItem} href={item.link}>
+              {item.name}
+            </Link>
+          </Dropdown>
         ))}
       </Flex>
+
+      <div className={styles.navbarContainer}>
+        <Flex className={styles.navbar} gap={20}>
+          {NAV_ITEMS.map((item) => (
+            <Link key={item.id} className={styles.navbarItem} href={item.link}>
+              {item.name}
+            </Link>
+          ))}
+        </Flex>
+      </div>
 
       <div className={styles.container}>
         <Input.Search
@@ -109,26 +128,6 @@ export const Header = () => {
             root: { width: "70%", marginTop: "30px" },
           }}
         />
-      </div>
-
-      {menuOpen && <div className={styles.overlay} onClick={toggleMenu} />}
-
-      <div className={`${styles.mobileMenu} ${menuOpen ? styles.open : ""}`}>
-        <button onClick={toggleMenu} className={styles.mobileMenu_closeBtn}>
-          <CloseOutlined />
-        </button>
-        <Link href="/" onClick={toggleMenu}>
-          Главная
-        </Link>
-        <Link href="/blog" onClick={toggleMenu}>
-          Блог
-        </Link>
-        <Link href="/map" onClick={toggleMenu}>
-          Где купить
-        </Link>
-        <a href="tel:88007003334" onClick={toggleMenu}>
-          {"8 (800) 700-33-34"}
-        </a>
       </div>
     </header>
   );

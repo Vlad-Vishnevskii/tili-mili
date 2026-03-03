@@ -11,23 +11,16 @@
   .slogan {
     margin-top: 10px;
     color: #d6a652;
+    text-align: center;
+
+    @media (max-width: 767px) {
+      font-size: 20px;
+    }
   }
 }
 
 .fullWidth {
   width: 100%;
-}
-
-.wrapperGrey {
-  position: relative;
-  background: #000103;
-  color: #ffffff;
-  background-image: url("/header/header-bg.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  box-sizing: border-box;
-  overflow: hidden;
-  font-family: var(--font-family);
 }
 
 .container {
@@ -41,19 +34,28 @@
   padding: 10px 50px;
 
   @media (max-width: 767px) {
-    padding: 0 20px;
+    padding: 0 12px;
   }
 }
 
 .navbar {
+  width: 100%;
+  padding: 0 16px;
+}
+
+.navbarDesktop {
   padding: 10px 15px;
   background-color: #d6a652;
   width: 100%;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
 }
 
 .navbarItem {
   display: flex;
-  justify-content: center;
+  flex-wrap: nowrap;
   align-items: center;
   text-align: center;
   padding: 0 7px;
@@ -63,261 +65,85 @@
   display: flex;
   align-items: center;
   color: #607d83;
+  font-size: 24px;
 
-  span {
-    font-weight: 500;
-    font-size: 20px;
-    color: #607d83;
+  @media (max-width: 767px) {
+    padding: 0;
+    font-size: 22px;
   }
 }
 
-.burgerBtn {
-  display: none;
+.phoneText {
+  font-weight: 500;
+  font-size: 20px;
+  color: #607d83;
 
-  svg {
-    fill: #ffffff;
-  }
-
-  &_black {
-    svg {
-      fill: #000103;
-    }
-  }
-
-  @media (max-width: 1200px) {
-    position: relative;
-    top: -4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: none;
-    cursor: pointer;
-    z-index: 1002;
-  }
-
-  @media (max-width: 767px) {
-    width: 30px;
-    height: 30px;
+  @media (max-width: 1300px) {
+    display: none;
   }
 }
 
 .logo {
   width: 200px;
   height: auto;
-}
-
-.mobileMenu {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
-  background: rgba(25, 25, 25, 0.8);
-  backdrop-filter: blur(10px);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
-  gap: 1.5rem;
-  transform: translateX(100%);
-  transition: transform 0.4s ease-in-out;
-  z-index: 1003;
-
-  a {
-    text-decoration: none;
-    color: #fff;
-    font-size: 1.3rem;
-    font-weight: 500;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: #68e1e4;
-    }
-  }
-
-  &_closeBtn {
-    top: 20px;
-    right: 20px;
-    position: absolute;
-    background: none;
-    color: #ffffff;
-    border: none;
-  }
-}
-
-.mobileMenu.open {
-  transform: translateX(0);
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1001;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.title {
-  font-family: var(--second-family);
-  font-weight: 500;
-  font-size: 70px;
-  line-height: 100%;
-  color: #ffffff;
-
-  @media (max-width: 1350px) {
-    font-size: 60px;
-  }
 
   @media (max-width: 767px) {
-    font-size: 35px;
-  }
-
-  b {
-    color: #68e1e4;
-    font-weight: 500;
-  }
-}
-
-.description {
-  font-family: var(--font-family);
-  font-weight: 400;
-  font-size: 25px;
-  line-height: 120%;
-  color: #d6d6d6;
-
-  @media (max-width: 767px) {
-    font-size: 18px;
-  }
-}
-
-.bottom {
-  margin-top: 190px;
-  min-height: 729px;
-  padding-bottom: 15%;
-
-  @media (max-width: 1350px) {
-    margin-top: 80px;
-  }
-
-  @media (max-width: 850px) {
-    margin-bottom: 110px;
-    padding-bottom: 25%;
-  }
-
-  @media (max-width: 767px) {
-    margin-top: 40px;
-    padding-bottom: 53%;
-    min-height: 550px;
-  }
-
-  @media (max-width: 400px) {
-    padding-bottom: 40%;
-  }
-}
-
-.bottomLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 61px;
-  padding-left: 100px;
-  width: 55%;
-
-  @media (max-width: 850px) {
-    padding-left: 50px;
-    padding-right: 50px;
-    width: 100%;
-  }
-
-  @media (max-width: 767px) {
-    gap: 30px;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-}
-
-.productImg {
-  position: absolute;
-  z-index: 1;
-  bottom: -200px;
-  right: -183px;
-
-  @media (max-width: 1750px) {
-    width: 100%;
-    max-width: 800px;
-    height: auto;
-    right: -150px;
-  }
-
-  @media (max-width: 1350px) {
-    max-width: 600px;
-  }
-
-  @media (max-width: 1023px) {
-    bottom: -60px;
-    right: -60px;
-    max-width: 450px;
-  }
-
-  @media (max-width: 767px) {
-    bottom: -150px;
-    right: -100px;
-  }
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 40px;
-  border: 1px solid #68e1e4;
-  border-radius: 70px;
-  padding: 25px 40px;
-  width: 306px;
-  height: auto;
-  text-decoration: none;
-  font-family: var(--font-family);
-  background: transparent;
-  font-weight: 500;
-  font-size: 30px;
-  color: #fff;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    color: #68e1e4;
-  }
-
-  @media (max-width: 767px) {
-    margin-top: 10px;
-    padding: 10px 10px;
-    font-size: 20px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  svg {
-    @media (max-width: 767px) {
-      width: 21px;
-      height: 21px;
-    }
+    width: 130px;
   }
 }
 
 .cartIcon {
   font-size: 33px;
   color: #d6a652;
+
+  @media (max-width: 767px) {
+    padding: 0;
+    font-size: 22px;
+  }
 }
 
 .cargoIcon {
   color: #d6a652;
+
+  @media (max-width: 767px) {
+    padding: 0;
+    svg {
+      width: 24px;
+    }
+  }
+}
+
+.rightIcons {
+  gap: 12px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.navbarContainer {
+  display: none;
+
+  @media (max-width: 900px) {
+    display: flex;
+    overflow-x: auto;
+    padding: 8px 0;
+    background-color: #d6a652;
+    scroll-padding-right: 16px;
+    width: 100%;
+    max-width: 100vw;
+    scrollbar-width: none; /* Убираем скроллбар в Firefox */
+    -ms-overflow-style: none; /* Убираем скроллбар в IE/Edge */
+    scroll-snap-type: x mandatory;
+    scroll-snap-align: start;
+  }
+}
+
+.navbarContainer::-webkit-scrollbar {
+  display: none; /* Убираем скроллбар в Chrome/Safari */
+}
+
+.navbar {
+  flex-wrap: nowrap; /* Предотвращаем перенос элементов на новую строку */
 }

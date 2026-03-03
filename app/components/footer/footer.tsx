@@ -8,7 +8,7 @@ import Link from "next/link";
 export const Footer = () => {
   return (
     <div className={styles.footer}>
-      <Flex className={styles.container} justify="space-between" align="center">
+      <Flex className={styles.container}>
         <Image
           src={FOOTER_IMG_PATHS.LOGO}
           className={styles.logo}
@@ -16,9 +16,9 @@ export const Footer = () => {
           height={200}
           alt="TILI-MILI"
         />
-        <Flex className={styles.nav} vertical gap={8}>
+        <Flex className={styles.nav}>
           <h3>Продукция</h3>
-          <Flex gap={10} wrap="wrap">
+          <Flex className={styles.navList}>
             {NAV_ITEMS.map((item) => (
               <Link href={item.link} key={item.id}>
                 {item.name}
@@ -27,7 +27,7 @@ export const Footer = () => {
           </Flex>
         </Flex>
 
-        <Flex vertical gap={8}>
+        <Flex className={styles.contacts}>
           <h3>Контакты</h3>
           <a href="">{"+7(916)-367-28-25"}</a>
         </Flex>

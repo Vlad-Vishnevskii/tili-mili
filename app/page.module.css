@@ -26,6 +26,10 @@
   padding: 60px;
   gap: 50px;
   margin: 0 auto;
+
+  @media (max-width: 767px) {
+    padding: 20px 16px;
+  }
 }
 
 .banner {
@@ -45,6 +49,10 @@
   h2 {
     color: #fff;
   }
+
+  @media (max-width: 767px) {
+    height: 180px;
+  }
 }
 
 .categoryList {
@@ -54,8 +62,19 @@
   gap: 40px;
   align-self: start;
   justify-content: center;
-  width: 1000px;
+  max-width: 1000px;
   margin: 0 auto;
+
+  @media (max-width: 1300px) {
+    grid-template-columns: 60%;
+    margin: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (max-width: 767px) {
+    grid-template-columns: 100%;
+  }
 }
 
 .categoryItem {

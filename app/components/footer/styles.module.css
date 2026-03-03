@@ -10,8 +10,48 @@
   width: 100%;
   max-width: 1300px;
   padding: 40px;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px 16px;
+  }
 }
 
 .nav {
   max-width: 35%;
+  flex-direction: column;
+  gap: 12px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: 15px;
+    max-width: 100%;
+  }
+}
+
+.navList {
+  flex-direction: column;
+  gap: 15px;
+
+  @media (max-width: 767px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+}
+
+.contacts {
+  flex-direction: column;
+  gap: 12px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 15px;
+  }
 }

@@ -1,43 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import classnames from "classnames";
 import styles from "./styles.module.css";
 import { Flex, Typography, Button, Input, Dropdown } from "antd";
 import { DeliveryIcon } from "../icons/delivery";
 import { HEADER_IMG_PATHS } from "./constants";
-import {
-  CloseOutlined,
-  MenuOutlined,
-  PhoneOutlined,
-  ShoppingCartOutlined,
-} from "@ant-design/icons";
+import { PhoneOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { NAV_ITEMS } from "../../constants";
 
 export const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setMenuOpen((prev) => !prev);
-  };
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    };
-  }, [menuOpen]);
-
   return (
     <header className={styles.wrapper}>
       <div className={styles.container}>

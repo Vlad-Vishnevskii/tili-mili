@@ -33,10 +33,13 @@
 }
 
 .navList {
-  flex-direction: column;
-  gap: 15px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 15px;
+  column-gap: 25px;
 
   @media (max-width: 767px) {
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 15px;

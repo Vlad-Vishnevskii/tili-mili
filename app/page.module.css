@@ -9,9 +9,10 @@
   --button-secondary-border: #ebebeb;
 
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-family: var(--font-geist-sans);
   background-color: var(--background);
 }
@@ -23,9 +24,10 @@
   width: 100%;
   max-width: 1300px;
   background-color: var(--foreground);
-  padding: 60px;
+  padding: 20px 60px;
   gap: 50px;
   margin: 0 auto;
+  flex-grow: 1;
 
   @media (max-width: 767px) {
     padding: 20px 16px;

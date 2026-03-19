@@ -6,34 +6,32 @@ import styles from "./page.module.css";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <div style={{ width: "100%", maxWidth: 1000 }}>
-        <Carousel arrows autoplay>
-          <div>
-            <div className={styles.banner}>
-              <Flex vertical>
-                <h2>Ближайшие доставки</h2>
-                <p>МСК и ОБЛ: 25.02.26</p>
-                <p>СПБ и ОБЛ: 29.02.26</p>
-              </Flex>
-            </div>
+    <Flex vertical gap={40} style={{ width: "100%", maxWidth: 1000 }}>
+      <Carousel arrows autoplay>
+        <div>
+          <div className={styles.banner}>
+            <Flex vertical>
+              <h2>Ближайшие доставки</h2>
+              <p>МСК и ОБЛ: 25.02.26</p>
+              <p>СПБ и ОБЛ: 29.02.26</p>
+            </Flex>
           </div>
-          <div>
-            <div className={styles.banner}>
-              <Flex vertical>
-                <h2>Предложение месяца</h2>
-              </Flex>
-            </div>
+        </div>
+        <div>
+          <div className={styles.banner}>
+            <Flex vertical>
+              <h2>Предложение месяца</h2>
+            </Flex>
           </div>
-          <div>
-            <div className={styles.banner}>
-              <Flex vertical>
-                <h2>Акции</h2>
-              </Flex>
-            </div>
+        </div>
+        <div>
+          <div className={styles.banner}>
+            <Flex vertical>
+              <h2>Акции</h2>
+            </Flex>
           </div>
-        </Carousel>
-      </div>
+        </div>
+      </Carousel>
 
       <div className={styles.categoryList}>
         {NAV_ITEMS.map((item) => (
@@ -43,6 +41,6 @@ export default function Home() {
           </Link>
         ))}
       </div>
-    </main>
+    </Flex>
   );
 }

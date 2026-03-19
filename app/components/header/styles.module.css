@@ -5,7 +5,8 @@
   background-repeat: no-repeat;
   background-size: cover;
   box-sizing: border-box;
-  overflow: hidden;
+  width: 100%;
+  /* overflow: hidden; */
   font-family: var(--font-family);
 
   .slogan {

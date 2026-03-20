@@ -8,7 +8,7 @@
   padding: 10px 20px;
 
   @media (max-width: 767px) {
-    padding: 0 12px;
+    padding: 0;
   }
 }
 
@@ -56,16 +56,21 @@
     height: 100%;
   }
 
-  .buyBtn {
+  .btnLink {
+    width: 100%;
     margin-top: auto;
+  }
+
+  .buyBtn {
     background-color: #d6a652;
     border-color: #d6a652;
     font-weight: 700;
     color: #ffffff;
+    width: 100%;
 
     &:not(:disabled):hover {
-      background-color: var(--text-primary);
-      border-color: var(--text-primary);
+      background-color: var(--color-secondary);
+      border-color: var(--color-secondary);
       color: #ffffff;
     }
   }

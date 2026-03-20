@@ -3,6 +3,7 @@ import styles from "./styles.module.css";
 import { Breadcrumb, Flex, Button } from "antd";
 import { PRODUCT_CARDS } from "@/app/constants";
 import Image from "next/image";
+import Link from "next/link";
 
 export const generateStaticParams = async () => {
   return NAV_ITEMS.map((cat) => ({
@@ -22,28 +23,30 @@ const CategoryPage = ({ params }: Props) => {
       <Breadcrumb
         items={[
           {
-            title: "Главная",
+            title: <Link href="/">Главная</Link>,
           },
           {
-            title: <a href="">Продукция</a>,
+            title: <Link href="">Продукция</Link>,
           },
           {
-            title: <a href="">Сыры</a>,
+            title: <Link href="">Сыры</Link>,
           },
         ]}
       />
-      <Flex gap={10} style={{ marginTop: "15px" }}>
+      <Flex gap={10} wrap style={{ marginTop: "15px" }}>
         {FILTERS.map((item) => (
           <Button key={item}>{item}</Button>
         ))}
       </Flex>
-      <Flex gap={20} className={styles.cardList}>
+      <Flex gap={20} className={styles.cardList} style={{ marginTop: "25px" }}>
         {PRODUCT_CARDS.map((card) => (
           <Flex className={styles.card} key={card.id} vertical>
             <Image src={card.img} width={200} height={100} alt="" />
             <Flex vertical className={styles.cardBottom} gap={20}>
               <h3>{card.name}</h3>
-              <Button className={styles.buyBtn}>Купить</Button>
+              <Link className={styles.btnLink} href={card.link} passHref>
+                <Button className={styles.buyBtn}>Купить</Button>
+              </Link>
             </Flex>
           </Flex>
         ))}

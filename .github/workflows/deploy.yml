@@ -20,7 +20,7 @@ jobs:
 
       # 2. Логинимся в GitHub Container Registry
       - name: Login to GHCR
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u vlad-vishnevskii --password-stdin
 
       # 3. Build Docker образ
       - name: Build Docker image
@@ -28,14 +28,14 @@ jobs:
 
       # 4. Push Docker образ
       - name: Push Docker image
-        run: docker push ghcr.io/USERNAME/next:latest
+        run: docker push ghcr.io/vlad-vishnevskii/next:latest
 
       # 5. Подключаемся к серверу и деплоим
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          vlad-vishnevskii: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22 # если у тебя нестандартный порт, меняешь
           script: |

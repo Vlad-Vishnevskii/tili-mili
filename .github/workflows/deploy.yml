@@ -35,7 +35,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
-          vlad-vishnevskii: ${{ secrets.SERVER_USER }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22 # если у тебя нестандартный порт, меняешь
           script: |

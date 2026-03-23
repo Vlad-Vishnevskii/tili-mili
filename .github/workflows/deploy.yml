@@ -15,7 +15,7 @@ jobs:
       # 1. Клонируем репозиторий
       - uses: actions/checkout@v4
 
-      # 2. Логинимся в GHCR через PAT
+      # 2. Логинимся в GHCR через PAT на GitHub Runner (для push)
       - name: Login to GHCR
         run: echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u vlad-vishnevskii --password-stdin
 
@@ -36,7 +36,12 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
+            # Логинимся в GHCR на сервере (для pull приватного образа)
+            echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u vlad-vishnevskii --password-stdin
+
+            # Логинимся в Docker Hub (для nginx)
             echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
             cd /var/www/app
             if command -v docker-compose &> /dev/null
             then

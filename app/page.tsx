@@ -13,7 +13,7 @@ export default function Home() {
             <Flex vertical>
               <h2>Ближайшие доставки</h2>
               <p>МСК и ОБЛ: 25.02.26</p>
-              <p>СПБ и ОБЛ: 29.02.26</p>
+              <p>СПБ и ОБЛ: 14.11.26</p>
             </Flex>
           </div>
         </div>

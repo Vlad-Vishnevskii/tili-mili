@@ -1,34 +1,31 @@
 name: Deploy Next.js
 
-# Запускаем workflow при пуше в main
 on:
   push:
     branches: [main]
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # Принудительно Node 24
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Шаги workflow
     steps:
       # 1. Клонируем репозиторий
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2. Логинимся в GitHub Container Registry
+      # 2. Логинимся в GHCR через PAT
       - name: Login to GHCR
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u vlad-vishnevskii --password-stdin
+        run: echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u vlad-vishnevskii --password-stdin
 
       # 3. Build Docker образ
       - name: Build Docker image
-        run: docker build -t ghcr.io/vlad-vishnevskii/next:latest .
+        run: docker build -t ghcr.io/vlad-vishnevskii/tili-mili:latest .
 
       # 4. Push Docker образ
       - name: Push Docker image
-        run: docker push ghcr.io/vlad-vishnevskii/next:latest
+        run: docker push ghcr.io/vlad-vishnevskii/tili-mili:latest
 
       # 5. Подключаемся к серверу и деплоим
       - name: Deploy to server
@@ -37,7 +34,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22 # если у тебя нестандартный порт, меняешь
+          port: 22
           script: |
             cd /var/www/app
             docker compose pull

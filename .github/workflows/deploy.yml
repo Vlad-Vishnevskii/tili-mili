@@ -24,7 +24,7 @@ jobs:
 
       # 3. Build Docker образ
       - name: Build Docker image
-        run: docker build -t ghcr.io/Vlad-Vishnevskii/next:latest .
+        run: docker build -t ghcr.io/vlad-vishnevskii/next:latest .
 
       # 4. Push Docker образ
       - name: Push Docker image

@@ -45,6 +45,9 @@
 }
 
 .navbarDesktop {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   padding: 10px 15px;
   background-color: #d6a652;
   width: 100%;

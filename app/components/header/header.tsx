@@ -62,7 +62,7 @@ export const Header = () => {
         </Typography.Title>
       </div>
 
-      <Flex justify="center" className={styles.navbarDesktop} gap={20}>
+      <div className={styles.navbarDesktop}>
         {NAV_ITEMS.map((item) => (
           <Dropdown
             key={item.id}
@@ -78,7 +78,7 @@ export const Header = () => {
             </Link>
           </Dropdown>
         ))}
-      </Flex>
+      </div>
 
       <div className={styles.navbarContainer}>
         <Flex className={styles.navbar} gap={20}>

@@ -6,25 +6,43 @@
   background-size: cover;
   box-sizing: border-box;
   width: 100%;
-  /* overflow: hidden; */
   font-family: var(--font-family);
+  padding-top: 16px;
 
-  .slogan {
-    margin-top: 10px;
-    color: #d6a652;
-    text-align: center;
-
-    @media (max-width: 767px) {
-      font-size: 20px;
-    }
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.54),
+        rgba(255, 255, 255, 0.18)
+      ),
+      radial-gradient(
+        circle at top center,
+        rgba(214, 166, 82, 0.14),
+        transparent 42%
+      );
+    pointer-events: none;
   }
 }
 
 .fullWidth {
   width: 100%;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (max-width: 767px) {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .container {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -32,24 +50,98 @@
   width: 100%;
   max-width: 1300px;
   margin: 0 auto;
-  padding: 10px 50px;
+  padding: 0 50px;
 
   @media (max-width: 767px) {
     padding: 0 12px;
   }
 }
 
+.heroCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 20px 28px 26px;
+  border-radius: 36px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.84),
+      rgba(255, 255, 255, 0.68)
+    ),
+    rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 54px rgba(96, 125, 131, 0.12);
+
+  @media (max-width: 767px) {
+    padding: 18px 14px 20px;
+    border-radius: 26px;
+  }
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+  }
+}
+
+.badges {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 50%;
+  flex-shrink: 0;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(214, 166, 82, 0.22);
+  color: #607d83;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 10px 24px rgba(96, 125, 131, 0.08);
+}
+
+.miniNote {
+  color: #8c6a29;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.search {
+  width: 50%;
+}
+
 .navbar {
   width: 100%;
-  padding: 0 16px;
+  padding: 0 12px;
+  flex-wrap: nowrap;
 }
 
 .navbarDesktop {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  padding: 10px 15px;
-  background-color: #d6a652;
+  margin-top: 16px;
+  padding: 0 16px 14px;
   width: 100%;
 
   @media (max-width: 900px) {
@@ -57,12 +149,38 @@
   }
 }
 
+.navbarDesktopInner {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 1300px;
+  padding: 10px 18px;
+  border: 1px solid rgba(214, 166, 82, 0.28);
+  border-radius: 999px;
+  background-color: rgba(214, 166, 82, 0.74);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 36px rgba(214, 166, 82, 0.16);
+}
+
 .navbarItem {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   text-align: center;
-  padding: 0 7px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.32);
+    color: #33454a;
+    transform: translateY(-1px);
+  }
 }
 
 .phone {
@@ -70,6 +188,7 @@
   align-items: center;
   color: #607d83;
   font-size: 24px;
+  flex-shrink: 0;
 
   @media (max-width: 767px) {
     padding: 0;
@@ -88,11 +207,12 @@
 }
 
 .logo {
-  width: 200px;
+  width: 180px;
   height: auto;
+  filter: drop-shadow(0 12px 22px rgba(96, 125, 131, 0.14));
 
   @media (max-width: 767px) {
-    width: 130px;
+    width: 122px;
   }
 }
 
@@ -112,7 +232,9 @@
   gap: 8px;
   padding: 6px 12px 6px 4px;
   border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.72);
+  background-color: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(214, 166, 82, 0.18);
+  box-shadow: 0 10px 24px rgba(96, 125, 131, 0.08);
 }
 
 .cartAmount {
@@ -131,6 +253,7 @@
 
   @media (max-width: 767px) {
     padding: 0;
+
     svg {
       width: 24px;
     }
@@ -152,22 +275,26 @@
   @media (max-width: 900px) {
     display: flex;
     overflow-x: auto;
-    padding: 8px 0;
-    background-color: #d6a652;
+    padding: 10px 0 14px;
+    background: transparent;
     scroll-padding-right: 16px;
     width: 100%;
     max-width: 100vw;
-    scrollbar-width: none; /* Убираем скроллбар в Firefox */
-    -ms-overflow-style: none; /* Убираем скроллбар в IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     scroll-snap-type: x mandatory;
     scroll-snap-align: start;
   }
 }
 
 .navbarContainer::-webkit-scrollbar {
-  display: none; /* Убираем скроллбар в Chrome/Safari */
+  display: none;
 }
 
-.navbar {
-  flex-wrap: nowrap; /* Предотвращаем перенос элементов на новую строку */
+@media (max-width: 900px) {
+  .navbarItem {
+    background-color: rgba(214, 166, 82, 0.74);
+    border: 1px solid rgba(214, 166, 82, 0.28);
+    box-shadow: 0 10px 24px rgba(96, 125, 131, 0.08);
+  }
 }

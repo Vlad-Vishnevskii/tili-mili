@@ -60,9 +60,18 @@ export default function Home() {
 
         <div className={styles.categoryList}>
           {NAV_ITEMS.map((item, index) => (
-            <Link className={styles.categoryItem} key={item.id} href={item.link}>
+            <Link
+              className={styles.categoryItem}
+              key={item.id}
+              href={item.link}
+            >
               <div className={styles.categoryImageWrap}>
-                <Image src={item.img} width={220} height={220} alt={item.name} />
+                <Image
+                  src={item.img}
+                  width={220}
+                  height={220}
+                  alt={item.name}
+                />
               </div>
               <div className={styles.categoryBody}>
                 <span className={styles.categoryIndex}>

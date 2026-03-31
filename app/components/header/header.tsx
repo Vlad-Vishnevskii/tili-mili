@@ -31,15 +31,17 @@ export const Header = () => {
               {"+7(916)-367-28-25"}
             </Typography.Text>
           </a>
-          <Flex vertical align="center">
-            <Image
-              src={HEADER_IMG_PATHS.LOGO}
-              className={styles.logo}
-              width={200}
-              height={200}
-              alt="TILI-MILI"
-            />
-          </Flex>
+          <Link href="/" aria-label="На главную">
+            <Flex vertical align="center">
+              <Image
+                src={HEADER_IMG_PATHS.LOGO}
+                className={styles.logo}
+                width={200}
+                height={200}
+                alt="TILI-MILI"
+              />
+            </Flex>
+          </Link>
           <Flex align="center" className={styles.rightIcons}>
             <Button
               classNames={{ icon: classnames(styles.cartIcon) }}
@@ -48,13 +50,15 @@ export const Header = () => {
               size="large"
               icon={<ShoppingCartOutlined />}
             />
-            <Button
-              classNames={{ icon: classnames(styles.cargoIcon) }}
-              variant="text"
-              type="text"
-              size="large"
-              icon={<DeliveryIcon />}
-            />
+            <Link href="/delivery" aria-label="Страница доставки">
+              <Button
+                classNames={{ icon: classnames(styles.cargoIcon) }}
+                variant="text"
+                type="text"
+                size="large"
+                icon={<DeliveryIcon />}
+              />
+            </Link>
           </Flex>
         </Flex>
         <Typography.Title className={styles.slogan} level={2}>

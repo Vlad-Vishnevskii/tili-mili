@@ -106,6 +106,26 @@
   }
 }
 
+.cartSummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 4px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+.cartAmount {
+  font-size: 16px;
+  font-weight: 700;
+  color: #607d83;
+  white-space: nowrap;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
 .cargoIcon {
   color: #d6a652;
 
@@ -122,7 +142,7 @@
 
   @media (max-width: 767px) {
     flex-direction: column;
-    gap: 0;
+    gap: 8px;
   }
 }
 

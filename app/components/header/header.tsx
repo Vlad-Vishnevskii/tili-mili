@@ -10,6 +10,8 @@ import { PhoneOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { NAV_ITEMS } from "../../constants";
 
+const MOCK_CART_TOTAL = "3 480 ₽";
+
 export const Header = () => {
   return (
     <header className={styles.wrapper}>
@@ -43,13 +45,16 @@ export const Header = () => {
             </Flex>
           </Link>
           <Flex align="center" className={styles.rightIcons}>
-            <Button
-              classNames={{ icon: classnames(styles.cartIcon) }}
-              variant="text"
-              type="text"
-              size="large"
-              icon={<ShoppingCartOutlined />}
-            />
+            <Link href="/" className={styles.cartSummary} aria-label="Корзина">
+              <Button
+                classNames={{ icon: classnames(styles.cartIcon) }}
+                variant="text"
+                type="text"
+                size="large"
+                icon={<ShoppingCartOutlined />}
+              />
+              <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
+            </Link>
             <Link href="/delivery" aria-label="Страница доставки">
               <Button
                 classNames={{ icon: classnames(styles.cargoIcon) }}

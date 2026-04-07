@@ -48,7 +48,11 @@
   border-radius: 34px;
   border: 1px solid rgba(214, 166, 82, 0.24);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 237, 0.94)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(248, 244, 237, 0.94)
+    ),
     #ffffff;
   box-shadow: 0 24px 56px rgba(96, 125, 131, 0.12);
 }
@@ -69,7 +73,11 @@
   overflow: hidden;
   border-radius: 28px;
   background:
-    radial-gradient(circle at top right, rgba(214, 166, 82, 0.22), transparent 32%),
+    radial-gradient(
+      circle at top right,
+      rgba(214, 166, 82, 0.22),
+      transparent 32%
+    ),
     linear-gradient(180deg, rgba(96, 125, 131, 0.08), rgba(96, 125, 131, 0.02));
 
   img {
@@ -125,7 +133,7 @@
 
 .name {
   margin: 0;
-  font-size: clamp(30px, 4vw, 48px);
+  font-size: 30px;
   line-height: 1.05;
   color: #1f1f1f;
 }
@@ -205,11 +213,13 @@
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 6px;
+  align-items: stretch;
 }
 
 .buyBtn {
+  width: 100%;
   min-width: 220px;
-  height: 50px !important;
+  height: 54px !important;
   border-radius: 999px !important;
   background-color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
@@ -226,6 +236,118 @@
     border-color: var(--color-secondary) !important;
     color: #ffffff !important;
   }
+}
+
+.purchaseBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.purchaseActions {
+  display: flex;
+  align-items: stretch;
+}
+
+.purchaseMeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.packageCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(248, 244, 237, 0.94)
+    ),
+    #ffffff;
+  border: 1px solid rgba(214, 166, 82, 0.18);
+  box-shadow: 0 16px 34px rgba(96, 125, 131, 0.08);
+}
+
+.packageLabel {
+  color: #607d83;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.packageWeight {
+  color: #25363a;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.packagePrice {
+  color: #d6a652;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 24px;
+  background-color: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(96, 125, 131, 0.1);
+
+  @media (max-width: 767px) {
+    justify-content: space-between;
+  }
+}
+
+.counterButton {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 16px;
+  background-color: #607d83;
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.counterButton:hover {
+  background-color: #4e686d;
+  transform: translateY(-1px);
+}
+
+.counterValue {
+  display: flex;
+  min-width: 88px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.counterValue strong {
+  color: #25363a;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.counterValue span {
+  color: #607d83;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .secondaryLink {

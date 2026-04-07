@@ -52,7 +52,6 @@
   background:
     linear-gradient(135deg, rgba(96, 125, 131, 0.96), rgba(71, 95, 101, 0.92)),
     #607d83;
-  box-shadow: 0 24px 60px rgba(96, 125, 131, 0.2);
 
   @media (max-width: 767px) {
     min-height: 280px;

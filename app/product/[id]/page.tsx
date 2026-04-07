@@ -1,8 +1,8 @@
-import styles from "./styles.module.css";
-import { Button } from "antd";
 import { PRODUCT_CARDS } from "@/app/constants";
 import Image from "next/image";
 import Link from "next/link";
+import { PurchaseControls } from "./purchase-controls";
+import styles from "./styles.module.css";
 
 export const generateStaticParams = async () => {
   return PRODUCT_CARDS.map((cat) => ({
@@ -51,7 +51,9 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
           <div className={styles.imageNote}>
             <span>Фермерский продукт</span>
-            <p>Аккуратная подготовка, натуральный состав и бережная упаковка.</p>
+            <p>
+              Аккуратная подготовка, натуральный состав и бережная упаковка.
+            </p>
           </div>
         </div>
 
@@ -59,20 +61,16 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           <span className={styles.kicker}>Карточка товара</span>
           <h1 className={styles.name}>{currentProduct.name}</h1>
 
-          <div className={styles.priceRow}>
-            <div className={styles.price}>
-              <span className={styles.priceMain}>{`${currentProduct.price} ₽`}</span>
-              <span className={styles.priceSmall}>
-                {`за ${currentProduct.unit.value} ${currentProduct.unit.name}`}
-              </span>
-            </div>
-
-            <div className={styles.badge}>Весовой товар</div>
-          </div>
+          <PurchaseControls
+            unitPrice={Number(currentProduct.price)}
+            unitName={currentProduct.unit.name}
+            unitValue={currentProduct.unit.value}
+          />
 
           <p className={styles.lead}>
-            Живой фермерский продукт с понятными характеристиками, который удобно
-            заказать как для повседневного рациона, так и для семейного стола.
+            Живой фермерский продукт с понятными характеристиками, который
+            удобно заказать как для повседневного рациона, так и для семейного
+            стола.
           </p>
 
           <ul className={styles.descriptionList}>
@@ -85,7 +83,6 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           </ul>
 
           <div className={styles.actions}>
-            <Button className={styles.buyBtn}>Добавить в корзину</Button>
             <Link href="/delivery" className={styles.secondaryLink}>
               Условия доставки
             </Link>

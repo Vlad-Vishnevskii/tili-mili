@@ -240,6 +240,7 @@
 }
 
 .cardImageWrap {
+  position: relative;
   display: block;
   overflow: hidden;
   aspect-ratio: 16 / 13;
@@ -254,6 +255,28 @@
 
 .card:hover .cardImageWrap img {
   transform: scale(1.04);
+}
+
+.promoBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(227, 58, 74, 0.98), rgba(189, 23, 42, 0.98));
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow:
+    0 12px 28px rgba(189, 23, 42, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
 .cardBody {
@@ -279,17 +302,21 @@
   }
 }
 
+.cardTitleLink {
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.cardTitleLink:hover {
+  color: #7d5b18;
+}
+
 .cardFooter {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
   margin-top: auto;
-
-  @media (max-width: 767px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 .priceBlock {
@@ -309,15 +336,6 @@
   }
 }
 
-.btnLink {
-  width: 100%;
-  max-width: 180px;
-
-  @media (max-width: 767px) {
-    max-width: none;
-  }
-}
-
 .buyBtn {
   width: 100%;
   height: 48px !important;
@@ -332,5 +350,96 @@
     background-color: var(--color-secondary) !important;
     border-color: var(--color-secondary) !important;
     color: #ffffff !important;
+  }
+}
+
+.cardPurchase {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardPurchaseTop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.cardPurchaseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(214, 166, 82, 0.16);
+}
+
+.cardPurchaseInfo strong {
+  color: #25363a;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.cardPurchaseLabel {
+  color: #607d83;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardPurchasePrice {
+  color: #d6a652;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cardCounter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(96, 125, 131, 0.1);
+}
+
+.cardCounterButton {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 12px;
+  background-color: #607d83;
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.cardCounterButton:hover {
+  background-color: #4e686d;
+  transform: translateY(-1px);
+}
+
+.cardCounterValue {
+  min-width: 18px;
+  color: #25363a;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .cardPurchaseTop {
+    grid-template-columns: 1fr;
+  }
+
+  .cardCounter {
+    justify-content: space-between;
   }
 }

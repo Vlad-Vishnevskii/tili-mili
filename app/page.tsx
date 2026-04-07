@@ -50,8 +50,7 @@ export default function Home() {
 
       <section className={styles.categoriesSection}>
         <div className={styles.sectionHeading}>
-          <span>Каталог</span>
-          <h2>Выберите категорию продуктов</h2>
+          <h2>Вкусные продукты из деревни с чистым составом</h2>
           <p>
             От основного семейного заказа до деликатесов, подарочных наборов и
             сезонных позиций для красивого стола.

@@ -1,5 +1,3 @@
-import { link } from "fs";
-
 export const NAV_ITEMS = [
   {
     id: 0,
@@ -170,6 +168,7 @@ export const PRODUCT_CARDS = [
     img: "/delicates-1.jpg",
     link: "/product/0",
     price: "910",
+    promoLabel: "Акция",
     unit: {
       value: 1,
       name: "кг",
@@ -269,6 +268,7 @@ export const PRODUCT_CARDS = [
     img: "/marinad.jpg",
     link: "/product/3",
     price: "910",
+    promoLabel: "Хит цены",
     unit: {
       value: 1,
       name: "кг",

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DeliveryZoneMap } from "./delivery-zone-map";
 import styles from "./styles.module.css";
 
 const DELIVERY_ZONES = [
@@ -105,6 +106,15 @@ export default function DeliveryPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeading}>
+          <span>Проверка адреса</span>
+          <h2>Интерактивная карта зон доставки</h2>
+        </div>
+
+        <DeliveryZoneMap />
       </section>
 
       <section className={styles.infoLayout}>

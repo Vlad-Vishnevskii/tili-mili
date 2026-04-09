@@ -136,6 +136,292 @@
   gap: 20px;
 }
 
+.mapCard {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid rgba(96, 125, 131, 0.18);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 253, 249, 0.98)),
+    #fffdf9;
+  box-shadow: 0 20px 40px rgba(96, 125, 131, 0.08);
+}
+
+.mapControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mapLayout {
+  display: grid;
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.mapSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mapSearch {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 22px;
+  background-color: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(96, 125, 131, 0.12);
+}
+
+.mapSearchLabel {
+  color: #2f454a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mapSearchInput {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid rgba(96, 125, 131, 0.16);
+  border-radius: 16px;
+  background-color: #ffffff;
+  color: #2f454a;
+  font: inherit;
+  outline: none;
+}
+
+.mapSearchInput:focus {
+  border-color: #607d83;
+  box-shadow: 0 0 0 3px rgba(96, 125, 131, 0.12);
+}
+
+.mapCheckButton {
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 999px;
+  background-color: #607d83;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.mapCheckButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background-color: #4e686d;
+}
+
+.mapCheckButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.mapTab {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid rgba(96, 125, 131, 0.16);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #55666c;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.mapTab:hover {
+  transform: translateY(-1px);
+}
+
+.mapTabActive {
+  border-color: #607d83;
+  background-color: #607d83;
+  color: #ffffff;
+}
+
+.mapFrameWrap {
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(96, 125, 131, 0.14);
+  background:
+    linear-gradient(180deg, rgba(248, 246, 241, 1), rgba(241, 241, 236, 1));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.mapCanvasWrap {
+  position: relative;
+  overflow: hidden;
+  min-height: 540px;
+  border-radius: 24px;
+  border: 1px solid rgba(96, 125, 131, 0.14);
+  background:
+    linear-gradient(180deg, rgba(248, 246, 241, 1), rgba(241, 241, 236, 1));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.mapCanvas {
+  width: 100%;
+  height: 540px;
+}
+
+.mapOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: rgba(255, 253, 249, 0.82);
+  color: #2f454a;
+  font-weight: 600;
+  text-align: center;
+}
+
+.mapFrame {
+  display: block;
+  width: 100%;
+  height: 540px;
+  border: 0;
+}
+
+.mapHint {
+  color: #4a4a4a;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.zoneList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zoneItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(96, 125, 131, 0.12);
+  border-radius: 18px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #2f454a;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  position: relative;
+}
+
+.zoneItem:hover {
+  transform: translateY(-1px);
+  border-color: rgba(96, 125, 131, 0.24);
+}
+
+.zoneItemActive {
+  border-color: rgba(96, 125, 131, 0.18);
+  background-color: rgba(96, 125, 131, 0.06);
+  box-shadow: 0 10px 20px rgba(96, 125, 131, 0.08);
+}
+
+.zoneSwatch {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  margin-top: 4px;
+  border-radius: 999px;
+  position: relative;
+}
+
+.zoneItemActive .zoneSwatch::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  opacity: 0.22;
+}
+
+.zoneItemActive .zoneSwatch {
+  color: #607d83;
+}
+
+.zoneItemContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zoneItemContent strong {
+  color: #2f454a;
+  font-size: 15px;
+}
+
+.zoneItemContent span {
+  color: #5c676b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.zoneDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 237, 0.94)),
+    #ffffff;
+  border: 1px solid rgba(214, 166, 82, 0.16);
+}
+
+.zoneDetails span {
+  color: #607d83;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.zoneDetails h3 {
+  margin: 0;
+  color: #2f454a;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.zoneDetails p {
+  margin: 0;
+  color: #4a4a4a;
+  line-height: 1.6;
+}
+
 .sectionHeading {
   display: flex;
   flex-direction: column;
@@ -280,6 +566,10 @@
     grid-template-columns: 1fr;
   }
 
+  .mapLayout {
+    grid-template-columns: 1fr;
+  }
+
   .heroContent h1 {
     max-width: none;
   }
@@ -294,7 +584,8 @@
   .hero,
   .zoneCard,
   .infoCard,
-  .contactCard {
+  .contactCard,
+  .mapCard {
     padding: 22px 18px;
     border-radius: 24px;
   }
@@ -313,5 +604,20 @@
   .secondaryAction,
   .contactLink {
     width: 100%;
+  }
+
+  .mapFrame {
+    height: 420px;
+  }
+
+  .mapCanvasWrap,
+  .mapCanvas {
+    min-height: 420px;
+    height: 420px;
+  }
+
+  .mapTab {
+    width: 100%;
+    white-space: normal;
   }
 }

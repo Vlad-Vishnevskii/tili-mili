@@ -25,6 +25,7 @@ export const ProductCardPurchase = ({
   packageWeight = 0.3,
 }: ProductCardPurchaseProps) => {
   const [portionCount, setPortionCount] = useState(1);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
 
   const totalWeight = packageWeight * portionCount;
   const totalPrice = (unitPrice / unitValue) * totalWeight;
@@ -34,8 +35,12 @@ export const ProductCardPurchase = ({
       <div className={styles.cardPurchaseTop}>
         <div className={styles.cardPurchaseInfo}>
           <span className={styles.cardPurchaseLabel}>Стандарт</span>
-          <strong>{formatWeight(totalWeight)} {unitName}</strong>
-          <span className={styles.cardPurchasePrice}>{formatPrice(totalPrice)} ₽</span>
+          <strong>
+            {formatWeight(totalWeight)} {unitName}
+          </strong>
+          <span className={styles.cardPurchasePrice}>
+            {formatPrice(totalPrice)} ₽
+          </span>
         </div>
 
         <div className={styles.cardCounter} aria-label="Количество порций">
@@ -61,8 +66,14 @@ export const ProductCardPurchase = ({
         </div>
       </div>
 
-      <Button className={styles.buyBtn}>
-        Добавить • {formatPrice(totalPrice)} ₽
+      <Button
+        className={`${styles.buyBtn} ${isAddedToCart ? styles.buyBtnActive : ""}`}
+        onClick={() => setIsAddedToCart(true)}
+        aria-pressed={isAddedToCart}
+      >
+        {isAddedToCart
+          ? `В корзине • ${formatPrice(totalPrice)} ₽`
+          : `Добавить • ${formatPrice(totalPrice)} ₽`}
       </Button>
     </div>
   );

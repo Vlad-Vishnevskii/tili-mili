@@ -131,6 +131,21 @@ const CategoryPage = async ({ params }: Props) => {
           ))}
         </div>
       </section>
+
+      {category.categoryDescription?.length ? (
+        <section className={styles.categoryDescription}>
+          <div className={styles.categoryDescriptionHeader}>
+            <span>О категории</span>
+            <h2>{category.name} от фермы до вашего стола</h2>
+          </div>
+
+          <div className={styles.categoryDescriptionBody}>
+            {category.categoryDescription.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 };

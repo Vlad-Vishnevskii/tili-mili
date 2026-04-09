@@ -25,6 +25,7 @@ export const PurchaseControls = ({
   packageWeight = 0.3,
 }: PurchaseControlsProps) => {
   const [portionCount, setPortionCount] = useState(1);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
 
   const totalWeight = packageWeight * portionCount;
   const totalPrice = (unitPrice / unitValue) * totalWeight;
@@ -69,8 +70,14 @@ export const PurchaseControls = ({
       </div>
 
       <div className={styles.purchaseActions}>
-        <Button className={styles.buyBtn}>
-          Добавить в корзину • {formatPrice(totalPrice)} ₽
+        <Button
+          className={`${styles.buyBtn} ${isAddedToCart ? styles.buyBtnActive : ""}`}
+          onClick={() => setIsAddedToCart(true)}
+          aria-pressed={isAddedToCart}
+        >
+          {isAddedToCart
+            ? `В корзине • ${formatPrice(totalPrice)} ₽`
+            : `Добавить в корзину • ${formatPrice(totalPrice)} ₽`}
         </Button>
       </div>
     </div>

@@ -20,26 +20,73 @@ export const Header = () => {
     <header className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.heroCard}>
-          <Flex className={styles.fullWidth} gap={20}>
-            <Link href="/" aria-label="На главную">
-              <Flex vertical align="center">
-                <Image
-                  src={HEADER_IMG_PATHS.LOGO}
-                  className={styles.logo}
-                  width={150}
-                  height={150}
-                  alt="TILI-MILI"
-                />
+          <div className={styles.headerGrid}>
+            <div className={styles.mobileTopRow}>
+              <Link
+                href="/"
+                aria-label="На главную"
+                className={styles.brandLink}
+              >
+                <Flex align="center" className={styles.brandBlock}>
+                  <Image
+                    src={HEADER_IMG_PATHS.LOGO}
+                    className={styles.logo}
+                    width={150}
+                    height={150}
+                    alt="TILI-MILI"
+                  />
+                </Flex>
+              </Link>
+
+              <Flex align="center" className={styles.rightIcons}>
+                <div className={styles.brandText}>
+                  <span className={styles.brandEyebrow}>
+                    Фермерские продукты из деревни
+                  </span>
+                </div>
+                <Link
+                  href="/"
+                  className={styles.cartSummary}
+                  aria-label="Корзина"
+                >
+                  <Button
+                    className={styles.cartButton}
+                    classNames={{ icon: classnames(styles.cartIcon) }}
+                    variant="text"
+                    type="text"
+                    size="large"
+                    icon={<ShoppingCartOutlined />}
+                  />
+                  <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
+                </Link>
+
+                <a className={styles.phone} href="tel:8800">
+                  <Button
+                    classNames={{
+                      root: styles.actionButton,
+                      icon: classnames(styles.phone),
+                    }}
+                    variant="text"
+                    type="text"
+                    size="large"
+                    icon={<PhoneOutlined />}
+                  />
+                </a>
               </Flex>
-            </Link>
+            </div>
 
             <div className={styles.mobileHeaderBox}>
-              <Flex
-                className={styles.iconWrapper}
-                gap={20}
-                align="center"
-                style={{ width: "100%" }}
-              >
+              <div className={styles.mobileSearchBlock}>
+                <div className={styles.mobileSearchMeta}>
+                  <Link href="/delivery" aria-label="Страница доставки">
+                    <span className={styles.searchBadge}>Доставка</span>
+                  </Link>
+
+                  <span className={styles.searchHint}>
+                    Выберите любимые блюда за пару касаний
+                  </span>
+                </div>
+
                 <Input.Search
                   placeholder="Что вы хотите найти"
                   onSearch={() => {}}
@@ -50,44 +97,9 @@ export const Header = () => {
                     input: { borderColor: "#607d83", color: "#607d83" },
                   }}
                 />
-
-                <Flex align="center" className={styles.rightIcons}>
-                  <Link href="/" className={styles.cartSummary} aria-label="Корзина">
-                    <Button
-                      classNames={{ icon: classnames(styles.cartIcon) }}
-                      variant="text"
-                      type="text"
-                      size="large"
-                      icon={<ShoppingCartOutlined />}
-                    />
-                    <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
-                  </Link>
-
-                  <Link href="/delivery" aria-label="Страница доставки">
-                    <Button
-                      classNames={{ icon: classnames(styles.cargoIcon) }}
-                      variant="text"
-                      type="text"
-                      size="large"
-                      icon={<DeliveryIcon />}
-                    />
-                  </Link>
-
-                  <a className={styles.phone} href="tel:8800">
-                    <Button
-                      classNames={{ icon: classnames(styles.phone) }}
-                      variant="text"
-                      type="text"
-                      size="large"
-                      icon={<PhoneOutlined />}
-                    />
-                  </a>
-                </Flex>
-              </Flex>
+              </div>
             </div>
-          </Flex>
-
-          <div className={styles.infoRow} />
+          </div>
         </div>
       </div>
 
@@ -119,7 +131,13 @@ export const Header = () => {
       <div className={styles.navbarContainer}>
         <Flex className={styles.navbar} gap={20}>
           {NAV_ITEMS.map((item) => (
-            <Link key={item.id} className={styles.navbarItem} href={item.link}>
+            <Link
+              key={item.id}
+              className={classnames(styles.navbarItem, {
+                [styles.navbarItemActive]: pathname === item.link,
+              })}
+              href={item.link}
+            >
               {item.name}
             </Link>
           ))}

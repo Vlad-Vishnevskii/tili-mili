@@ -1,20 +1,77 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import classnames from "classnames";
 import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
 import { Flex, Button, Input, Dropdown } from "antd";
-import { DeliveryIcon } from "../icons/delivery";
 import { HEADER_IMG_PATHS } from "./constants";
-import { PhoneOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import {
+  LeftOutlined,
+  PhoneOutlined,
+  RightOutlined,
+  ShoppingCartOutlined,
+} from "@ant-design/icons";
 import Image from "next/image";
 import { NAV_ITEMS } from "../../constants";
 
 const MOCK_CART_TOTAL = "3 480 ₽";
+const DESKTOP_NAV_SCROLL_STEP = 280;
 
 export const Header = () => {
   const pathname = usePathname();
+  const desktopNavRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    const navElement = desktopNavRef.current;
+
+    if (!navElement) {
+      return;
+    }
+
+    const updateDesktopNavState = () => {
+      const maxScrollLeft = navElement.scrollWidth - navElement.clientWidth;
+
+      setCanScrollLeft(navElement.scrollLeft > 8);
+      setCanScrollRight(maxScrollLeft - navElement.scrollLeft > 8);
+    };
+
+    updateDesktopNavState();
+
+    navElement.addEventListener("scroll", updateDesktopNavState, {
+      passive: true,
+    });
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateDesktopNavState();
+    });
+
+    resizeObserver.observe(navElement);
+
+    return () => {
+      navElement.removeEventListener("scroll", updateDesktopNavState);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  const scrollDesktopNav = (direction: "left" | "right") => {
+    const navElement = desktopNavRef.current;
+
+    if (!navElement) {
+      return;
+    }
+
+    navElement.scrollBy({
+      left:
+        direction === "left"
+          ? -DESKTOP_NAV_SCROLL_STEP
+          : DESKTOP_NAV_SCROLL_STEP,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <header className={styles.wrapper}>
@@ -46,7 +103,10 @@ export const Header = () => {
                 </div>
                 <Link
                   href="/"
-                  className={styles.cartSummary}
+                  className={classnames(
+                    styles.cartSummary,
+                    styles.desktopHidden,
+                  )}
                   aria-label="Корзина"
                 >
                   <Button
@@ -60,7 +120,10 @@ export const Header = () => {
                   <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
                 </Link>
 
-                <a className={styles.phone} href="tel:8800">
+                <a
+                  className={classnames(styles.phone, styles.desktopHidden)}
+                  href="tel:8800"
+                >
                   <Button
                     classNames={{
                       root: styles.actionButton,
@@ -99,32 +162,109 @@ export const Header = () => {
                 />
               </div>
             </div>
+
+            <Flex gap={10} align="center" className={styles.mibileHidden}>
+              <Link
+                href="/"
+                className={styles.cartSummary}
+                aria-label="Корзина"
+              >
+                <Button
+                  className={styles.cartButton}
+                  classNames={{ icon: classnames(styles.cartIcon) }}
+                  variant="text"
+                  type="text"
+                  size="large"
+                  icon={<ShoppingCartOutlined />}
+                />
+                <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
+              </Link>
+
+              <a className={styles.phone} href="tel:8800">
+                <Button
+                  classNames={{
+                    root: styles.actionButton,
+                    icon: classnames(styles.phone),
+                  }}
+                  variant="text"
+                  type="text"
+                  size="large"
+                  icon={<PhoneOutlined />}
+                />
+              </a>
+            </Flex>
           </div>
         </div>
       </div>
 
       <div className={styles.navbarDesktop}>
-        <div className={styles.navbarDesktopInner}>
-          {NAV_ITEMS.map((item) => (
-            <Dropdown
-              key={item.id}
-              menu={{
-                items: item.subCategories.map((subCategory) => ({
-                  key: subCategory.id.toString(),
-                  label: <Link href="/">{subCategory.label}</Link>,
-                })),
-              }}
-            >
-              <Link
-                className={classnames(styles.navbarItem, {
-                  [styles.navbarItemActive]: pathname === item.link,
-                })}
-                href={item.link}
-              >
-                {item.name}
-              </Link>
-            </Dropdown>
-          ))}
+        <div
+          className={classnames(styles.navbarDesktopShell, {
+            [styles.navbarDesktopShellScrollable]:
+              canScrollLeft || canScrollRight,
+          })}
+        >
+          <button
+            type="button"
+            className={classnames(
+              styles.navScrollButton,
+              styles.navScrollButtonLeft,
+              {
+                [styles.navScrollButtonHidden]: !canScrollLeft,
+              },
+            )}
+            onClick={() => scrollDesktopNav("left")}
+            aria-label="Прокрутить меню влево"
+            tabIndex={canScrollLeft ? 0 : -1}
+          >
+            <LeftOutlined />
+          </button>
+
+          <div
+            className={classnames(styles.navbarDesktopViewport, {
+              [styles.navbarDesktopViewportLeftFade]: canScrollLeft,
+              [styles.navbarDesktopViewportRightFade]: canScrollRight,
+            })}
+          >
+            <div ref={desktopNavRef} className={styles.navbarDesktopInner}>
+              {NAV_ITEMS.map((item) => (
+                <Dropdown
+                  key={item.id}
+                  menu={{
+                    items: item.subCategories.map((subCategory) => ({
+                      key: subCategory.id.toString(),
+                      label: <Link href="/">{subCategory.label}</Link>,
+                    })),
+                  }}
+                >
+                  <Link
+                    className={classnames(styles.navbarItem, {
+                      [styles.navbarItemActive]: pathname === item.link,
+                    })}
+                    href={item.link}
+                  >
+                    {item.name}
+                  </Link>
+                </Dropdown>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className={classnames(
+              styles.navScrollButton,
+              styles.navScrollButtonRight,
+              {
+                [styles.navScrollButtonHidden]: !canScrollRight,
+              },
+            )}
+            onClick={() => scrollDesktopNav("right")}
+            aria-label="Прокрутить меню вправо"
+            tabIndex={canScrollRight ? 0 : -1}
+          >
+            <RightOutlined />
+          </button>
         </div>
       </div>
 

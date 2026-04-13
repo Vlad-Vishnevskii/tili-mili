@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import classnames from "classnames";
 import { usePathname } from "next/navigation";
-import styles from "./styles.module.css";
 import { Flex, Button, Input, Dropdown } from "antd";
-import { HEADER_IMG_PATHS } from "./constants";
 import {
   LeftOutlined,
   PhoneOutlined,
@@ -14,16 +12,73 @@ import {
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import Image from "next/image";
-import { NAV_ITEMS } from "../../constants";
+import styles from "./styles.module.css";
+import {
+  FREE_DELIVERY_THRESHOLD,
+  HEADER_IMG_PATHS,
+  MOCK_CART_ITEMS,
+} from "./constants";
+import { NAV_ITEMS, PRODUCT_CARDS } from "../../constants";
+import { CartModal } from "./cart-modal";
 
-const MOCK_CART_TOTAL = "3 480 ₽";
 const DESKTOP_NAV_SCROLL_STEP = 280;
+
+type CartItem = {
+  productId: number;
+  quantity: number;
+  packageWeight: number;
+};
+
+const formatPrice = (value: number) =>
+  new Intl.NumberFormat("ru-RU", {
+    maximumFractionDigits: 0,
+  }).format(Math.round(value));
 
 export const Header = () => {
   const pathname = usePathname();
   const desktopNavRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() =>
+    MOCK_CART_ITEMS.map((item) => ({ ...item })),
+  );
+
+  const cartProducts = cartItems
+    .map((item) => {
+      const product = PRODUCT_CARDS.find((card) => card.id === item.productId);
+
+      if (!product) {
+        return null;
+      }
+
+      const unitPrice = Number(product.price);
+      const itemWeight = item.packageWeight * item.quantity;
+      const itemTotal = unitPrice * item.packageWeight * item.quantity;
+
+      return {
+        ...item,
+        product,
+        itemWeight,
+        itemTotal,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalWeight = cartProducts.reduce(
+    (sum, item) => sum + item.itemWeight,
+    0,
+  );
+  const totalPrice = cartProducts.reduce(
+    (sum, item) => sum + item.itemTotal,
+    0,
+  );
+  const amountLeftForFreeDelivery = Math.max(
+    FREE_DELIVERY_THRESHOLD - totalPrice,
+    0,
+  );
+  const cartAmountLabel = totalItems ? `${formatPrice(totalPrice)} ₽` : "";
 
   useEffect(() => {
     const navElement = desktopNavRef.current;
@@ -73,6 +128,28 @@ export const Header = () => {
     });
   };
 
+  const updateCartItemQuantity = (productId: number, nextQuantity: number) => {
+    setCartItems((current) =>
+      current
+        .map((item) =>
+          item.productId === productId
+            ? { ...item, quantity: nextQuantity }
+            : item,
+        )
+        .filter((item) => item.quantity > 0),
+    );
+  };
+
+  const removeCartItem = (productId: number) => {
+    setCartItems((current) =>
+      current.filter((item) => item.productId !== productId),
+    );
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <header className={styles.wrapper}>
       <div className={styles.container}>
@@ -101,13 +178,15 @@ export const Header = () => {
                     Фермерские продукты из деревни
                   </span>
                 </div>
-                <Link
-                  href="/"
+                <button
+                  type="button"
                   className={classnames(
                     styles.cartSummary,
+                    styles.cartSummaryButton,
                     styles.desktopHidden,
                   )}
                   aria-label="Корзина"
+                  onClick={() => setIsCartOpen(true)}
                 >
                   <Button
                     className={styles.cartButton}
@@ -117,8 +196,8 @@ export const Header = () => {
                     size="large"
                     icon={<ShoppingCartOutlined />}
                   />
-                  <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
-                </Link>
+                  <span className={styles.cartAmount}>{cartAmountLabel}</span>
+                </button>
 
                 <a
                   className={classnames(styles.phone, styles.desktopHidden)}
@@ -164,10 +243,14 @@ export const Header = () => {
             </div>
 
             <Flex gap={10} align="center" className={styles.mibileHidden}>
-              <Link
-                href="/"
-                className={styles.cartSummary}
+              <button
+                type="button"
+                className={classnames(
+                  styles.cartSummary,
+                  styles.cartSummaryButton,
+                )}
                 aria-label="Корзина"
+                onClick={() => setIsCartOpen(true)}
               >
                 <Button
                   className={styles.cartButton}
@@ -177,8 +260,8 @@ export const Header = () => {
                   size="large"
                   icon={<ShoppingCartOutlined />}
                 />
-                <span className={styles.cartAmount}>{MOCK_CART_TOTAL}</span>
-              </Link>
+                <span className={styles.cartAmount}>{cartAmountLabel}</span>
+              </button>
 
               <a className={styles.phone} href="tel:8800">
                 <Button
@@ -283,6 +366,19 @@ export const Header = () => {
           ))}
         </Flex>
       </div>
+
+      <CartModal
+        amountLeftForFreeDelivery={amountLeftForFreeDelivery}
+        cartProducts={cartProducts}
+        isOpen={isCartOpen}
+        onClearCart={clearCart}
+        onClose={() => setIsCartOpen(false)}
+        onRemoveItem={removeCartItem}
+        onUpdateQuantity={updateCartItemQuantity}
+        totalItems={totalItems}
+        totalPrice={totalPrice}
+        totalWeight={totalWeight}
+      />
     </header>
   );
 };

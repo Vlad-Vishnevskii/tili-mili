@@ -362,6 +362,10 @@
   }
 }
 
+.cartSummaryButton {
+  cursor: pointer;
+}
+
 .cartButton {
   width: 42px !important;
   min-width: 42px;
@@ -724,4 +728,10 @@
   @media (max-width: 1023px) {
     display: none !important;
   }
+}
+
+@media (max-width: 1023px) {
+}
+
+@media (max-width: 767px) {
 }

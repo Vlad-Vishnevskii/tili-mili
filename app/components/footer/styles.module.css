@@ -2,8 +2,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #e0d7c6;
+  background:
+    linear-gradient(180deg, rgba(244, 238, 226, 0.96), rgba(229, 220, 201, 0.98)),
+    #e0d7c6;
   width: 100%;
+  border-top: 1px solid rgba(214, 166, 82, 0.2);
 }
 
 .container {
@@ -12,13 +15,21 @@
   max-width: 1300px;
   padding: 40px;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 32px;
 
   @media (max-width: 767px) {
     flex-direction: column;
-    gap: 15px;
+    gap: 22px;
     padding: 20px 16px;
   }
+}
+
+.logo {
+  width: 132px;
+  height: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 12px 22px rgba(96, 125, 131, 0.14));
 }
 
 .nav {
@@ -39,6 +50,18 @@
   row-gap: 15px;
   column-gap: 25px;
 
+  a {
+    color: #55666c;
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  a:hover {
+    color: #7d5b18;
+    transform: translateY(-1px);
+  }
+
   @media (max-width: 767px) {
     display: flex;
     flex-direction: row;
@@ -51,11 +74,96 @@
   flex-direction: column;
   gap: 12px;
 
+  h3 {
+    margin: 0;
+  }
+
+  a {
+    color: #33454a;
+  }
+
   @media (max-width: 767px) {
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 15px;
+  }
+}
+
+.blogLink {
+  font-weight: 700;
+}
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 166, 82, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 242, 232, 0.92)),
+    rgba(255, 255, 255, 0.82);
+  color: #607d83;
+  box-shadow:
+    0 10px 24px rgba(96, 125, 131, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.socialLink:hover {
+  color: #8c6a29;
+  border-color: rgba(214, 166, 82, 0.42);
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 28px rgba(96, 125, 131, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.socialIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.disclaimerWrap {
+  width: 100%;
+  border-top: 1px solid rgba(96, 125, 131, 0.12);
+  background-color: rgba(255, 255, 255, 0.26);
+}
+
+.disclaimer {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 16px 40px 22px;
+  color: #5f6668;
+  font-size: 12px;
+  line-height: 1.65;
+
+  p {
+    margin: 0;
+  }
+
+  p + p {
+    margin-top: 6px;
+  }
+
+  @media (max-width: 767px) {
+    padding: 14px 16px 18px;
+    font-size: 11px;
+    line-height: 1.55;
   }
 }

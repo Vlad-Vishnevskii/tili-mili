@@ -1,0 +1,35 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(96, 125, 131, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(237, 244, 247, 0.94)),
+    rgba(255, 255, 255, 0.94);
+  color: #607d83;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow:
+    0 12px 28px rgba(96, 125, 131, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background-color: rgba(96, 125, 131, 0.12);
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+}

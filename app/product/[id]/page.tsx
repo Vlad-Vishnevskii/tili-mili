@@ -1,6 +1,7 @@
 import { PRODUCT_CARDS } from "@/app/constants";
 import Image from "next/image";
 import Link from "next/link";
+import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
 import { PurchaseControls } from "./purchase-controls";
 import styles from "./styles.module.css";
 
@@ -59,7 +60,12 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
         <div className={styles.infoCard}>
           <span className={styles.kicker}>Карточка товара</span>
-          <h1 className={styles.name}>{currentProduct.name}</h1>
+          <div className={styles.titleBlock}>
+            <h1 className={styles.name}>{currentProduct.name}</h1>
+            {currentProduct.freezeLabel ? (
+              <FreezeBadge label={currentProduct.freezeLabel} />
+            ) : null}
+          </div>
 
           <PurchaseControls
             unitPrice={Number(currentProduct.price)}

@@ -201,6 +201,7 @@ export const PRODUCT_CARDS = [
     link: "/product/0",
     price: "910",
     promoLabel: "Акция",
+    freezeLabel: "Заморозка",
     unit: {
       value: 1,
       name: "кг",
@@ -275,6 +276,7 @@ export const PRODUCT_CARDS = [
     img: "/eggs.jpg",
     link: "/product/2",
     price: "910",
+    freezeLabel: "Заморозка",
     unit: {
       value: 1,
       name: "кг",
@@ -313,6 +315,7 @@ export const PRODUCT_CARDS = [
     link: "/product/3",
     price: "910",
     promoLabel: "Хит цены",
+    freezeLabel: "Заморозка",
     unit: {
       value: 1,
       name: "кг",
@@ -424,6 +427,7 @@ export const PRODUCT_CARDS = [
     img: "/delicates-1.jpg",
     link: "/product/6",
     price: "910",
+    freezeLabel: "Заморозка",
     unit: {
       value: 1,
       name: "кг",

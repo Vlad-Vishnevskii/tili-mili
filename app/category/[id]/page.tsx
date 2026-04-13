@@ -4,6 +4,7 @@ import { Button } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductCardPurchase } from "./product-card-purchase";
+import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
 
 export const generateStaticParams = async () => {
   return NAV_ITEMS.map((cat) => ({
@@ -98,6 +99,13 @@ const CategoryPage = async ({ params }: Props) => {
               <Link href={card.link} className={styles.cardImageWrap}>
                 {card.promoLabel ? (
                   <span className={styles.promoBadge}>{card.promoLabel}</span>
+                ) : null}
+
+                {card.freezeLabel ? (
+                  <FreezeBadge
+                    className={styles.freezeBadge}
+                    label={card.freezeLabel}
+                  />
                 ) : null}
                 <Image
                   src={card.img}

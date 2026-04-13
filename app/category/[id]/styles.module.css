@@ -280,6 +280,13 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
+.freezeBadge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+}
+
 .cardBody {
   display: flex;
   flex-direction: column;

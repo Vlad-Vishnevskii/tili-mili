@@ -138,6 +138,14 @@
   color: #1f1f1f;
 }
 
+.titleBlock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .priceRow {
   display: flex;
   justify-content: space-between;

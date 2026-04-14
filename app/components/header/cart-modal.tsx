@@ -261,46 +261,52 @@ export const CartModal = ({
                           {item.product.name}
                         </Link>
                         <div className={styles.itemMeta}>
-                          {formatWeight(item.packageWeight)} {item.product.unit.name} / шт
+                          {formatWeight(item.packageWeight)}{" "}
+                          {item.product.unit.name} / шт
                         </div>
                         <div className={styles.itemSubmeta}>
                           {item.product.freezeLabel ?? "Фермерский продукт"}
                         </div>
                       </div>
 
-                      <div className={styles.itemCounter}>
-                        <button
-                          type="button"
-                          className={styles.itemCounterButton}
-                          onClick={() =>
-                            onUpdateQuantity(
-                              item.product.id,
-                              Math.max(0, item.quantity - 1),
-                            )
-                          }
-                          aria-label="Уменьшить количество"
-                        >
-                          <MinusOutlined />
-                        </button>
+                      <div className={styles.priceWrapper}>
+                        <div className={styles.itemCounter}>
+                          <button
+                            type="button"
+                            className={styles.itemCounterButton}
+                            onClick={() =>
+                              onUpdateQuantity(
+                                item.product.id,
+                                Math.max(0, item.quantity - 1),
+                              )
+                            }
+                            aria-label="Уменьшить количество"
+                          >
+                            <MinusOutlined />
+                          </button>
 
-                        <span className={styles.itemCounterValue}>
-                          {item.quantity}
-                        </span>
+                          <span className={styles.itemCounterValue}>
+                            {item.quantity}
+                          </span>
 
-                        <button
-                          type="button"
-                          className={styles.itemCounterButton}
-                          onClick={() =>
-                            onUpdateQuantity(item.product.id, item.quantity + 1)
-                          }
-                          aria-label="Увеличить количество"
-                        >
-                          <PlusOutlined />
-                        </button>
-                      </div>
+                          <button
+                            type="button"
+                            className={styles.itemCounterButton}
+                            onClick={() =>
+                              onUpdateQuantity(
+                                item.product.id,
+                                item.quantity + 1,
+                              )
+                            }
+                            aria-label="Увеличить количество"
+                          >
+                            <PlusOutlined />
+                          </button>
+                        </div>
 
-                      <div className={styles.itemPrice}>
-                        {formatPrice(item.itemTotal)} ₽
+                        <div className={styles.itemPrice}>
+                          {formatPrice(item.itemTotal)} ₽
+                        </div>
                       </div>
 
                       <button
@@ -344,7 +350,9 @@ export const CartModal = ({
                       <span>Имя</span>
                       <Input
                         value={checkoutForm.name}
-                        status={touchedFields.name && fieldErrors.name ? "error" : ""}
+                        status={
+                          touchedFields.name && fieldErrors.name ? "error" : ""
+                        }
                         onBlur={() => touchField("name")}
                         onChange={(event) =>
                           updateFieldValue("name", event.target.value)
@@ -352,7 +360,9 @@ export const CartModal = ({
                         placeholder="Как к вам обращаться"
                       />
                       {touchedFields.name && fieldErrors.name ? (
-                        <span className={styles.fieldError}>{fieldErrors.name}</span>
+                        <span className={styles.fieldError}>
+                          {fieldErrors.name}
+                        </span>
                       ) : null}
                     </label>
 
@@ -360,7 +370,11 @@ export const CartModal = ({
                       <span>Телефон</span>
                       <Input
                         value={checkoutForm.phone}
-                        status={touchedFields.phone && fieldErrors.phone ? "error" : ""}
+                        status={
+                          touchedFields.phone && fieldErrors.phone
+                            ? "error"
+                            : ""
+                        }
                         onBlur={() => touchField("phone")}
                         onChange={(event) =>
                           updateFieldValue("phone", event.target.value)
@@ -368,7 +382,9 @@ export const CartModal = ({
                         placeholder="+7 (___) ___-__-__"
                       />
                       {touchedFields.phone && fieldErrors.phone ? (
-                        <span className={styles.fieldError}>{fieldErrors.phone}</span>
+                        <span className={styles.fieldError}>
+                          {fieldErrors.phone}
+                        </span>
                       ) : null}
                     </label>
 
@@ -377,7 +393,9 @@ export const CartModal = ({
                       <Input
                         value={checkoutForm.address}
                         status={
-                          touchedFields.address && fieldErrors.address ? "error" : ""
+                          touchedFields.address && fieldErrors.address
+                            ? "error"
+                            : ""
                         }
                         onBlur={() => touchField("address")}
                         onChange={(event) =>
@@ -386,7 +404,9 @@ export const CartModal = ({
                         placeholder="Город, улица, дом, подъезд, квартира"
                       />
                       {touchedFields.address && fieldErrors.address ? (
-                        <span className={styles.fieldError}>{fieldErrors.address}</span>
+                        <span className={styles.fieldError}>
+                          {fieldErrors.address}
+                        </span>
                       ) : null}
                     </label>
 
@@ -395,7 +415,9 @@ export const CartModal = ({
                       <Input.TextArea
                         value={checkoutForm.comment}
                         status={
-                          touchedFields.comment && fieldErrors.comment ? "error" : ""
+                          touchedFields.comment && fieldErrors.comment
+                            ? "error"
+                            : ""
                         }
                         onBlur={() => touchField("comment")}
                         onChange={(event) =>
@@ -405,7 +427,9 @@ export const CartModal = ({
                         rows={4}
                       />
                       {touchedFields.comment && fieldErrors.comment ? (
-                        <span className={styles.fieldError}>{fieldErrors.comment}</span>
+                        <span className={styles.fieldError}>
+                          {fieldErrors.comment}
+                        </span>
                       ) : null}
                     </label>
                   </div>

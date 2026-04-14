@@ -47,7 +47,9 @@ export const ProductCardPurchase = ({
           <button
             type="button"
             className={styles.cardCounterButton}
-            onClick={() => setPortionCount((current) => Math.max(1, current - 1))}
+            onClick={() =>
+              setPortionCount((current) => Math.max(1, current - 1))
+            }
             aria-label="Уменьшить количество"
           >
             -
@@ -72,7 +74,7 @@ export const ProductCardPurchase = ({
         aria-pressed={isAddedToCart}
       >
         {isAddedToCart
-          ? `В корзине • ${formatPrice(totalPrice)} ₽`
+          ? `Добавлено • ${formatPrice(totalPrice)} ₽`
           : `Добавить • ${formatPrice(totalPrice)} ₽`}
       </Button>
     </div>

@@ -38,14 +38,18 @@ export const PurchaseControls = ({
           <strong className={styles.packageWeight}>
             {formatWeight(packageWeight)} {unitName}
           </strong>
-          <span className={styles.packagePrice}>{formatPrice(totalPrice)} ₽</span>
+          <span className={styles.packagePrice}>
+            {formatPrice(totalPrice)} ₽
+          </span>
         </div>
 
         <div className={styles.counter} aria-label="Количество порций">
           <button
             type="button"
             className={styles.counterButton}
-            onClick={() => setPortionCount((current) => Math.max(1, current - 1))}
+            onClick={() =>
+              setPortionCount((current) => Math.max(1, current - 1))
+            }
             aria-label="Уменьшить количество"
           >
             -
@@ -76,8 +80,8 @@ export const PurchaseControls = ({
           aria-pressed={isAddedToCart}
         >
           {isAddedToCart
-            ? `В корзине • ${formatPrice(totalPrice)} ₽`
-            : `Добавить в корзину • ${formatPrice(totalPrice)} ₽`}
+            ? `Добавлено • ${formatPrice(totalPrice)} ₽`
+            : `Добавить • ${formatPrice(totalPrice)} ₽`}
         </Button>
       </div>
     </div>

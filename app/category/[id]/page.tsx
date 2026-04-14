@@ -22,6 +22,7 @@ const CategoryPage = async ({ params }: Props) => {
   const { id } = await params;
   const category =
     NAV_ITEMS.find((item) => String(item.id) === id) ?? NAV_ITEMS[0];
+  const availableProducts = PRODUCT_CARDS.filter((card) => !card.isOutOfStock);
 
   return (
     <div className={styles.container}>
@@ -45,7 +46,7 @@ const CategoryPage = async ({ params }: Props) => {
 
           <div className={styles.heroFacts}>
             <div className={styles.factCard}>
-              <strong>{PRODUCT_CARDS.length}</strong>
+              <strong>{availableProducts.length}</strong>
               <span>позиций в наличии</span>
             </div>
             <div className={styles.factCard}>
@@ -101,6 +102,10 @@ const CategoryPage = async ({ params }: Props) => {
                   <span className={styles.promoBadge}>{card.promoLabel}</span>
                 ) : null}
 
+                {card.isOutOfStock ? (
+                  <span className={styles.outOfStockBadge}>Нет в наличии</span>
+                ) : null}
+
                 {card.freezeLabel ? (
                   <FreezeBadge
                     className={styles.freezeBadge}
@@ -129,9 +134,11 @@ const CategoryPage = async ({ params }: Props) => {
 
                 <div className={styles.cardFooter}>
                   <ProductCardPurchase
+                    productLink={card.link}
                     unitPrice={Number(card.price)}
                     unitName={card.unit.name}
                     unitValue={card.unit.value}
+                    isOutOfStock={card.isOutOfStock}
                   />
                 </div>
               </div>

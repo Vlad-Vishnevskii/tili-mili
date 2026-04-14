@@ -193,13 +193,33 @@ export const NAV_ITEMS = [
   },
 ];
 
-export const PRODUCT_CARDS = [
+export type ProductCard = {
+  id: number;
+  name: string;
+  img: string;
+  link: string;
+  price: string;
+  promoLabel?: string;
+  freezeLabel?: string;
+  isOutOfStock?: boolean;
+  unit: {
+    value: number;
+    name: string;
+  };
+  description: Array<{
+    name: string;
+    text: string;
+  }>;
+};
+
+export const PRODUCT_CARDS: ProductCard[] = [
   {
     id: 0,
     name: "Филе бедра индейки",
     img: "/delicates-1.jpg",
     link: "/product/0",
     price: "910",
+    isOutOfStock: true,
     promoLabel: "Акция",
     freezeLabel: "Заморозка",
     unit: {

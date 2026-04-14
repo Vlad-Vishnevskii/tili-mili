@@ -42,6 +42,9 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       <section className={styles.productShell}>
         <div className={styles.galleryCard}>
           <div className={styles.imageWrap}>
+            {currentProduct.isOutOfStock ? (
+              <span className={styles.outOfStockBadge}>Нет в наличии</span>
+            ) : null}
             <Image
               src={currentProduct.img}
               width={620}
@@ -68,9 +71,11 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           </div>
 
           <PurchaseControls
+            productLink="#description"
             unitPrice={Number(currentProduct.price)}
             unitName={currentProduct.unit.name}
             unitValue={currentProduct.unit.value}
+            isOutOfStock={currentProduct.isOutOfStock}
           />
 
           <p className={styles.lead}>
@@ -79,7 +84,7 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
             стола.
           </p>
 
-          <ul className={styles.descriptionList}>
+          <ul id="description" className={styles.descriptionList}>
             {currentProduct.description.map((item) => (
               <li key={item.name} className={styles.descriptionItem}>
                 <strong>{item.name}</strong>

@@ -1,14 +1,17 @@
 "use client";
 
 import { Button } from "antd";
+import Link from "next/link";
 import { useState } from "react";
 import styles from "./styles.module.css";
 
 type PurchaseControlsProps = {
+  productLink: string;
   unitPrice: number;
   unitName: string;
   unitValue: number;
   packageWeight?: number;
+  isOutOfStock?: boolean;
 };
 
 const formatWeight = (value: number) => value.toFixed(1).replace(".", ",");
@@ -19,16 +22,34 @@ const formatPrice = (value: number) =>
   }).format(Math.round(value));
 
 export const PurchaseControls = ({
+  productLink,
   unitPrice,
   unitName,
   unitValue,
   packageWeight = 0.3,
+  isOutOfStock = false,
 }: PurchaseControlsProps) => {
   const [portionCount, setPortionCount] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
 
   const totalWeight = packageWeight * portionCount;
   const totalPrice = (unitPrice / unitValue) * totalWeight;
+
+  if (isOutOfStock) {
+    return (
+      <div className={styles.purchaseBlock}>
+        <div className={styles.outOfStockCard}>
+          <span className={styles.packageLabel}>Нет в наличии</span>
+          <strong className={styles.packageWeight}>
+            Товар сейчас недоступен
+          </strong>
+          <span className={styles.outOfStockText}>
+            Пока можно посмотреть только описание и характеристики товара.
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.purchaseBlock}>

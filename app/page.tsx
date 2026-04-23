@@ -1,31 +1,15 @@
-import { NAV_ITEMS } from "./constants";
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Flex, Carousel } from "antd";
+import { CATEGORY_CARD_COPY, HERO_SLIDES } from "./constants";
+import { useCategoriesQuery } from "@/app/lib/catalog-queries";
 import styles from "./page.module.css";
 
-const HERO_SLIDES = [
-  {
-    title: "Ближайшие доставки",
-    text: "Собираем заказы вручную и привозим фермерские продукты в удобные даты без лишней суеты.",
-    meta: ["Москва и область: 25.02.26", "Санкт-Петербург и область: 14.11.26"],
-    accent: "Свежие поставки каждую неделю",
-  },
-  {
-    title: "Предложение месяца",
-    text: "Выбрали продукты, которые особенно хороши сейчас: с чистым составом, красивой подачей и настоящим деревенским вкусом.",
-    meta: ["Наборы к семейному столу", "Сезонные позиции и деликатесы"],
-    accent: "Собрано с акцентом на сезон",
-  },
-  {
-    title: "Акции",
-    text: "Подбираем выгодные предложения так, чтобы скидка помогала собрать корзину, а не отвлекала от качества продукта.",
-    meta: ["Спеццены на категории", "Подарочные варианты к заказу"],
-    accent: "Спокойные выгодные покупки",
-  },
-];
-
 export default function Home() {
+  const { data: categories = [], isLoading, isError } = useCategoriesQuery();
+
   return (
     <Flex vertical gap={48} className={styles.home}>
       <Carousel arrows autoplay>
@@ -57,30 +41,25 @@ export default function Home() {
           </p>
         </div>
 
+        {isLoading ? <p>Загружаем категории из Strapi...</p> : null}
+        {isError ? <p>Не удалось загрузить категории.</p> : null}
+
         <div className={styles.categoryList}>
-          {NAV_ITEMS.map((item, index) => (
+          {categories.map((item, index) => (
             <Link
               className={styles.categoryItem}
               key={item.id}
               href={item.link}
             >
               <div className={styles.categoryImageWrap}>
-                <Image
-                  src={item.img}
-                  width={220}
-                  height={220}
-                  alt={item.name}
-                />
+                <Image src={item.img} width={220} height={220} alt={item.name} />
               </div>
               <div className={styles.categoryBody}>
                 <span className={styles.categoryIndex}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <strong>{item.name}</strong>
-                <p>
-                  Свежие позиции, аккуратная сборка и честный вкус без лишних
-                  компромиссов.
-                </p>
+                <p>{CATEGORY_CARD_COPY}</p>
               </div>
             </Link>
           ))}

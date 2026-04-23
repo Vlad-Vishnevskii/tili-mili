@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./styles.module.css";
 import Image from "next/image";
 import {
@@ -6,10 +8,12 @@ import {
   FOOTER_SOCIALS,
 } from "./constants";
 import { Flex } from "antd";
-import { NAV_ITEMS } from "../../constants";
 import Link from "next/link";
+import { useCategoriesQuery } from "@/app/lib/catalog-queries";
 
 export const Footer = () => {
+  const { data: categories = [] } = useCategoriesQuery();
+
   return (
     <div className={styles.footer}>
       <div className={styles.container}>
@@ -23,7 +27,7 @@ export const Footer = () => {
         <Flex className={styles.nav}>
           <h3>Продукция</h3>
           <div className={styles.navList}>
-            {NAV_ITEMS.map((item) => (
+            {categories.map((item) => (
               <Link href={item.link} key={item.id}>
                 {item.name}
               </Link>

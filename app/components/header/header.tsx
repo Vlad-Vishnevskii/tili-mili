@@ -18,8 +18,11 @@ import {
   HEADER_IMG_PATHS,
   MOCK_CART_ITEMS,
 } from "./constants";
-import { NAV_ITEMS, PRODUCT_CARDS } from "../../constants";
 import { CartModal } from "./cart-modal";
+import {
+  useCategoriesQuery,
+  useProductsQuery,
+} from "@/app/lib/catalog-queries";
 
 const DESKTOP_NAV_SCROLL_STEP = 280;
 
@@ -36,6 +39,8 @@ const formatPrice = (value: number) =>
 
 export const Header = () => {
   const pathname = usePathname();
+  const { data: categories = [] } = useCategoriesQuery();
+  const { data: products = [] } = useProductsQuery();
   const desktopNavRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -46,7 +51,7 @@ export const Header = () => {
 
   const cartProducts = cartItems
     .map((item) => {
-      const product = PRODUCT_CARDS.find((card) => card.id === item.productId);
+      const product = products.find((card) => card.id === item.productId);
 
       if (!product) {
         return null;
@@ -310,7 +315,7 @@ export const Header = () => {
             })}
           >
             <div ref={desktopNavRef} className={styles.navbarDesktopInner}>
-              {NAV_ITEMS.map((item) => (
+              {categories.map((item) => (
                 <Dropdown
                   key={item.id}
                   menu={{
@@ -353,7 +358,7 @@ export const Header = () => {
 
       <div className={styles.navbarContainer}>
         <Flex className={styles.navbar} gap={20}>
-          {NAV_ITEMS.map((item) => (
+          {categories.map((item) => (
             <Link
               key={item.id}
               className={classnames(styles.navbarItem, {

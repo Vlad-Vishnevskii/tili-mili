@@ -1,24 +1,25 @@
-import { PRODUCT_CARDS } from "@/app/constants";
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
+import { useProductsQuery } from "@/app/lib/catalog-queries";
 import { PurchaseControls } from "./purchase-controls";
 import styles from "./styles.module.css";
 
-export const generateStaticParams = async () => {
-  return PRODUCT_CARDS.map((cat) => ({
-    id: String(cat.id),
-  }));
+type ProductPageClientProps = {
+  productSlug: string;
 };
 
-const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
-  const { id } = await params;
+export const ProductPageClient = ({ productSlug }: ProductPageClientProps) => {
+  const { data: products = [], isLoading, isError } = useProductsQuery();
+  const currentProduct = products.find((item) => item.slug === productSlug);
 
-  const currentProduct = PRODUCT_CARDS.find(
-    (item) => item.id.toString() === id,
-  );
+  if (isLoading) {
+    return <div className={styles.container}>Загружаем товар...</div>;
+  }
 
-  if (!currentProduct) {
+  if (isError || !currentProduct) {
     return (
       <div className={styles.container}>
         <div className={styles.notFound}>
@@ -34,7 +35,7 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
         <Link href="/">Главная</Link>
         <span>/</span>
-        <Link href="/category/0">Продукция</Link>
+        <Link href={currentProduct.category?.link ?? "/"}>Продукция</Link>
         <span>/</span>
         <span aria-current="page">{currentProduct.name}</span>
       </nav>
@@ -71,17 +72,15 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           </div>
 
           <PurchaseControls
-            productLink="#description"
-            unitPrice={Number(currentProduct.price)}
+            unitPrice={currentProduct.price}
             unitName={currentProduct.unit.name}
             unitValue={currentProduct.unit.value}
             isOutOfStock={currentProduct.isOutOfStock}
           />
 
           <p className={styles.lead}>
-            Живой фермерский продукт с понятными характеристиками, который
-            удобно заказать как для повседневного рациона, так и для семейного
-            стола.
+            {currentProduct.description[0]?.text ??
+              "Живой фермерский продукт с понятными характеристиками, который удобно заказать как для повседневного рациона, так и для семейного стола."}
           </p>
 
           <ul id="description" className={styles.descriptionList}>
@@ -103,5 +102,3 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
     </div>
   );
 };
-
-export default ProductPage;

@@ -1,28 +1,53 @@
-import { NAV_ITEMS, PRODUCT_CARDS } from "@/app/constants";
-import styles from "./styles.module.css";
+"use client";
+
 import { Button } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { ProductCardPurchase } from "./product-card-purchase";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
+import { useCategoriesQuery, useProductsQuery } from "@/app/lib/catalog-queries";
+import { ProductCardPurchase } from "./product-card-purchase";
+import styles from "./styles.module.css";
 
-export const generateStaticParams = async () => {
-  return NAV_ITEMS.map((cat) => ({
-    id: String(cat.id),
-  }));
+type CategoryPageClientProps = {
+  categorySlug: string;
 };
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
+export const CategoryPageClient = ({
+  categorySlug,
+}: CategoryPageClientProps) => {
+  const { data: categories = [], isLoading, isError } = useCategoriesQuery();
+  const { data: products = [] } = useProductsQuery();
 
-const FILTERS = ["Курица", "Субпродукты", "Индейка", "Яйца"];
+  const category = categories.find((item) => item.slug === categorySlug);
+  const categoryProducts = products.filter(
+    (product) => product.category?.id === category?.id,
+  );
+  const availableProducts = categoryProducts.filter(
+    (card) => !card.isOutOfStock,
+  );
+  const minPrice = categoryProducts.length
+    ? Math.min(...categoryProducts.map((product) => product.price))
+    : null;
 
-const CategoryPage = async ({ params }: Props) => {
-  const { id } = await params;
-  const category =
-    NAV_ITEMS.find((item) => String(item.id) === id) ?? NAV_ITEMS[0];
-  const availableProducts = PRODUCT_CARDS.filter((card) => !card.isOutOfStock);
+  if (isLoading) {
+    return <div className={styles.container}>Загружаем категорию...</div>;
+  }
+
+  if (isError || !category) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.categoryDescription}>
+          <div className={styles.categoryDescriptionHeader}>
+            <span>Категория</span>
+            <h2>Категория не найдена</h2>
+          </div>
+          <div className={styles.categoryDescriptionBody}>
+            <p>Проверьте данные в Strapi или выберите другой раздел каталога.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -50,7 +75,7 @@ const CategoryPage = async ({ params }: Props) => {
               <span>позиций в наличии</span>
             </div>
             <div className={styles.factCard}>
-              <strong>от 910 ₽</strong>
+              <strong>{minPrice ? `от ${minPrice} ₽` : "по запросу"}</strong>
               <span>стартовая цена</span>
             </div>
           </div>
@@ -66,25 +91,27 @@ const CategoryPage = async ({ params }: Props) => {
         </div>
       </section>
 
-      <section className={styles.filtersSection}>
-        <div className={styles.filtersHeader}>
-          <span>Подборка</span>
-          <h2>Фильтры внутри категории</h2>
-        </div>
+      {category.subCategories.length ? (
+        <section className={styles.filtersSection}>
+          <div className={styles.filtersHeader}>
+            <span>Подборка</span>
+            <h2>Фильтры внутри категории</h2>
+          </div>
 
-        <div className={styles.filters}>
-          {FILTERS.map((item, index) => (
-            <Button
-              key={item}
-              className={
-                index === 0 ? styles.filterActive : styles.filterButton
-              }
-            >
-              {item}
-            </Button>
-          ))}
-        </div>
-      </section>
+          <div className={styles.filters}>
+            {category.subCategories.map((item, index) => (
+              <Button
+                key={item.id}
+                className={
+                  index === 0 ? styles.filterActive : styles.filterButton
+                }
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className={styles.catalogSection}>
         <div className={styles.catalogHeader}>
@@ -95,7 +122,7 @@ const CategoryPage = async ({ params }: Props) => {
         </div>
 
         <div className={styles.cardList}>
-          {PRODUCT_CARDS.map((card) => (
+          {categoryProducts.map((card) => (
             <article className={styles.card} key={card.id}>
               <Link href={card.link} className={styles.cardImageWrap}>
                 {card.promoLabel ? (
@@ -112,12 +139,7 @@ const CategoryPage = async ({ params }: Props) => {
                     label={card.freezeLabel}
                   />
                 ) : null}
-                <Image
-                  src={card.img}
-                  width={320}
-                  height={280}
-                  alt={card.name}
-                />
+                <Image src={card.img} width={320} height={280} alt={card.name} />
               </Link>
 
               <div className={styles.cardBody}>
@@ -135,7 +157,7 @@ const CategoryPage = async ({ params }: Props) => {
                 <div className={styles.cardFooter}>
                   <ProductCardPurchase
                     productLink={card.link}
-                    unitPrice={Number(card.price)}
+                    unitPrice={card.price}
                     unitName={card.unit.name}
                     unitValue={card.unit.value}
                     isOutOfStock={card.isOutOfStock}
@@ -147,7 +169,7 @@ const CategoryPage = async ({ params }: Props) => {
         </div>
       </section>
 
-      {category.categoryDescription?.length ? (
+      {category.categoryDescription.length ? (
         <section className={styles.categoryDescription}>
           <div className={styles.categoryDescriptionHeader}>
             <span>О категории</span>
@@ -164,5 +186,3 @@ const CategoryPage = async ({ params }: Props) => {
     </div>
   );
 };
-
-export default CategoryPage;

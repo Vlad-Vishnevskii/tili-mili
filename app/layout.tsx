@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Header, Footer } from "./components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { QueryProvider } from "./providers/query-provider";
 import styles from "./page.module.css";
 
 const geistSans = Geist({
@@ -35,9 +36,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${styles.page}`}
       >
         <AntdRegistry>
-          <Header />
-          <main className={styles.main}>{children}</main>
-          <Footer />
+          <QueryProvider>
+            <Header />
+            <main className={styles.main}>{children}</main>
+            <Footer />
+          </QueryProvider>
         </AntdRegistry>
       </body>
     </html>

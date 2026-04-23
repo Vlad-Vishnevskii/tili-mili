@@ -1,12 +1,10 @@
 "use client";
 
 import { Button } from "antd";
-import Link from "next/link";
 import { useState } from "react";
 import styles from "./styles.module.css";
 
 type PurchaseControlsProps = {
-  productLink: string;
   unitPrice: number;
   unitName: string;
   unitValue: number;
@@ -22,7 +20,6 @@ const formatPrice = (value: number) =>
   }).format(Math.round(value));
 
 export const PurchaseControls = ({
-  productLink,
   unitPrice,
   unitName,
   unitValue,

@@ -4,17 +4,17 @@ export const HEADER_IMG_PATHS = {
 
 export const MOCK_CART_ITEMS = [
   {
-    productId: 0,
+    productId: 2,
     quantity: 2,
     packageWeight: 0.5,
   },
   {
-    productId: 1,
+    productId: 4,
     quantity: 1,
     packageWeight: 0.3,
   },
   {
-    productId: 3,
+    productId: 8,
     quantity: 1,
     packageWeight: 0.2,
   },

@@ -526,7 +526,7 @@ export const CartModal = ({
                   <strong>{formatWeight(totalWeight)} кг</strong>
                 </div>
                 <div className={styles.summaryRow}>
-                  <span>Стоимость продуктов</span>
+                  <span>Итого:</span>
                   <strong>{formatPrice(totalPrice)} ₽</strong>
                 </div>
               </div>
@@ -555,11 +555,6 @@ export const CartModal = ({
                     : "Отправить заявку"}
               </Button>
 
-              <span className={styles.summaryHint}>
-                {view === "cart"
-                  ? "Минимальная сумма заявки 900 ₽"
-                  : "После отправки мы свяжемся с вами для подтверждения"}
-              </span>
               {submitMessage ? (
                 <span className={styles.submitSuccess}>{submitMessage}</span>
               ) : null}

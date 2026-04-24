@@ -32,12 +32,23 @@ export const ProductCardPurchase = ({
   packageWeight = 0.3,
   isOutOfStock = false,
 }: ProductCardPurchaseProps) => {
-  const [portionCount, setPortionCount] = useState(1);
-  const [isAddedToCart, setIsAddedToCart] = useState(false);
-  const { addToCart } = useCart();
+  const [draftPortionCount, setDraftPortionCount] = useState(1);
+  const { addToCart, cartItems, updateCartItemQuantity } = useCart();
+  const cartItem = cartItems.find((item) => item.productId === productId);
 
+  const portionCount = cartItem?.quantity ?? draftPortionCount;
   const totalWeight = packageWeight * portionCount;
   const totalPrice = (unitPrice / unitValue) * totalWeight;
+  const isAddedToCart = Boolean(cartItem);
+
+  const handlePortionCountChange = (nextPortionCount: number) => {
+    if (!cartItem) {
+      setDraftPortionCount(nextPortionCount);
+      return;
+    }
+
+    updateCartItemQuantity(productId, nextPortionCount);
+  };
 
   if (isOutOfStock) {
     return (
@@ -74,9 +85,7 @@ export const ProductCardPurchase = ({
           <button
             type="button"
             className={styles.cardCounterButton}
-            onClick={() =>
-              setPortionCount((current) => Math.max(1, current - 1))
-            }
+            onClick={() => handlePortionCountChange(Math.max(1, portionCount - 1))}
             aria-label="Уменьшить количество"
           >
             -
@@ -87,7 +96,7 @@ export const ProductCardPurchase = ({
           <button
             type="button"
             className={styles.cardCounterButton}
-            onClick={() => setPortionCount((current) => current + 1)}
+            onClick={() => handlePortionCountChange(portionCount + 1)}
             aria-label="Увеличить количество"
           >
             +
@@ -103,7 +112,7 @@ export const ProductCardPurchase = ({
             quantity: portionCount,
             packageWeight,
           });
-          setIsAddedToCart(true);
+          setDraftPortionCount(1);
         }}
         aria-pressed={isAddedToCart}
       >

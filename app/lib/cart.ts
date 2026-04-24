@@ -8,6 +8,7 @@ export type CartItem = {
 
 export type OrderRequestPayload = {
   customerName: string;
+  customerEmail: string;
   customerPhone: string;
   deliveryAddress: string;
   comment: string;

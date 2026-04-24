@@ -40,7 +40,8 @@ export const Footer = () => {
 
         <Flex className={styles.contacts}>
           <h3>Контакты</h3>
-          <a href="">{"+7(916)-367-28-25"}</a>
+          <a href="tel:+79163672825">+7(916)-367-28-25</a>
+          <a href="mailto:fermatilimili@yandex.ru">fermatilimili@yandex.ru</a>
           <div className={styles.socials}>
             {FOOTER_SOCIALS.map((social) => (
               <a

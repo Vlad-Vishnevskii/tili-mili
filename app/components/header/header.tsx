@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FocusEvent } from "react";
 import Link from "next/link";
 import classnames from "classnames";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Flex, Button, Input, Dropdown } from "antd";
 import {
   LeftOutlined,
@@ -13,38 +13,111 @@ import {
 } from "@ant-design/icons";
 import Image from "next/image";
 import styles from "./styles.module.css";
-import {
-  FREE_DELIVERY_THRESHOLD,
-  HEADER_IMG_PATHS,
-} from "./constants";
+import { FREE_DELIVERY_THRESHOLD, HEADER_IMG_PATHS } from "./constants";
 import { CartModal } from "./cart-modal";
 import {
   useCategoriesQuery,
   useProductsQuery,
 } from "@/app/lib/catalog-queries";
+import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
 import { useCart } from "@/app/providers/cart-provider";
 
 const DESKTOP_NAV_SCROLL_STEP = 280;
+const SEARCH_RESULTS_LIMIT = 8;
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
     maximumFractionDigits: 0,
   }).format(Math.round(value));
 
+type SearchResult = {
+  id: string;
+  title: string;
+  subtitle: string;
+  link: string;
+  type: "category" | "product";
+};
+
+const normalizeSearchValue = (value: string) =>
+  value.toLowerCase().trim().replace(/\s+/g, " ");
+
+const getCategorySearchResults = (
+  categories: CatalogCategory[],
+  searchValue: string,
+): SearchResult[] =>
+  categories
+    .filter((category) => {
+      const haystack = normalizeSearchValue(
+        [
+          category.name,
+          category.slug,
+          ...category.subCategories.map((item) => item.label),
+        ].join(" "),
+      );
+
+      return haystack.includes(searchValue);
+    })
+    .map((category) => ({
+      id: `category-${category.id}`,
+      title: category.name,
+      subtitle: "Категория",
+      link: category.link,
+      type: "category",
+    }));
+
+const getProductSearchResults = (
+  products: CatalogProduct[],
+  searchValue: string,
+): SearchResult[] =>
+  products
+    .filter((product) => {
+      const haystack = normalizeSearchValue(
+        [
+          product.name,
+          product.slug,
+          product.category?.name ?? "",
+          product.freezeLabel ?? "",
+          product.promoLabel ?? "",
+        ].join(" "),
+      );
+
+      return haystack.includes(searchValue);
+    })
+    .map((product) => ({
+      id: `product-${product.id}`,
+      title: product.name,
+      subtitle: product.category?.name
+        ? `Товар • ${product.category.name}`
+        : "Товар",
+      link: product.link,
+      type: "product",
+    }));
+
 export const Header = () => {
+  const router = useRouter();
   const pathname = usePathname();
   const { data: categories = [] } = useCategoriesQuery();
   const { data: products = [] } = useProductsQuery();
-  const {
-    cartItems,
-    clearCart,
-    removeCartItem,
-    updateCartItemQuantity,
-  } = useCart();
+  const { cartItems, clearCart, removeCartItem, updateCartItemQuantity } =
+    useCart();
   const desktopNavRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const normalizedSearchValue = normalizeSearchValue(searchValue);
+  const searchResults = normalizedSearchValue
+    ? [
+        ...getCategorySearchResults(categories, normalizedSearchValue),
+        ...getProductSearchResults(products, normalizedSearchValue),
+      ].slice(0, SEARCH_RESULTS_LIMIT)
+    : [];
+  const isSearchDropdownOpen = Boolean(
+    normalizedSearchValue && isSearchFocused,
+  );
 
   const cartProducts = cartItems
     .map((item) => {
@@ -114,6 +187,20 @@ export const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!searchRef.current?.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, []);
+
   const scrollDesktopNav = (direction: "left" | "right") => {
     const navElement = desktopNavRef.current;
 
@@ -128,6 +215,28 @@ export const Header = () => {
           : DESKTOP_NAV_SCROLL_STEP,
       behavior: "smooth",
     });
+  };
+
+  const handleSearchNavigate = (link: string) => {
+    router.push(link);
+    setSearchValue("");
+    setIsSearchFocused(false);
+  };
+
+  const handleSearchSubmit = () => {
+    if (!searchResults.length) {
+      return;
+    }
+
+    handleSearchNavigate(searchResults[0].link);
+  };
+
+  const handleSearchBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (searchRef.current?.contains(event.relatedTarget as Node | null)) {
+      return;
+    }
+
+    setIsSearchFocused(false);
   };
 
   return (
@@ -181,7 +290,7 @@ export const Header = () => {
 
                 <a
                   className={classnames(styles.phone, styles.desktopHidden)}
-                  href="tel:8800"
+                  href="tel:+79163672825"
                 >
                   <Button
                     classNames={{
@@ -209,16 +318,56 @@ export const Header = () => {
                   </span>
                 </div>
 
-                <Input.Search
-                  placeholder="Что вы хотите найти"
-                  onSearch={() => {}}
-                  enterButton
-                  className={styles.search}
-                  styles={{
-                    button: { root: { backgroundColor: "#607d83" } },
-                    input: { borderColor: "#607d83", color: "#607d83" },
-                  }}
-                />
+                <div
+                  ref={searchRef}
+                  className={styles.searchShell}
+                  onBlur={handleSearchBlur}
+                >
+                  <Input.Search
+                    placeholder="Что вы хотите найти"
+                    value={searchValue}
+                    onChange={(event) => {
+                      setSearchValue(event.target.value);
+                      setIsSearchFocused(true);
+                    }}
+                    onFocus={() => setIsSearchFocused(true)}
+                    onSearch={handleSearchSubmit}
+                    enterButton
+                    className={styles.search}
+                    styles={{
+                      button: { root: { backgroundColor: "#607d83" } },
+                      input: { borderColor: "#607d83", color: "#607d83" },
+                    }}
+                  />
+
+                  {isSearchDropdownOpen ? (
+                    <div className={styles.searchResults} role="listbox">
+                      {searchResults.length ? (
+                        searchResults.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            className={styles.searchResultItem}
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={() => handleSearchNavigate(item.link)}
+                          >
+                            <span className={styles.searchResultType}>
+                              {item.type === "category" ? "Категория" : "Товар"}
+                            </span>
+                            <strong>{item.title}</strong>
+                            <span className={styles.searchResultSubtitle}>
+                              {item.subtitle}
+                            </span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className={styles.searchEmpty}>
+                          Ничего не найдено
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
 

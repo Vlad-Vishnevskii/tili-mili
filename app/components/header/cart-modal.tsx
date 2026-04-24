@@ -54,7 +54,7 @@ type CartModalProps = {
 };
 
 type CartModalView = "cart" | "checkout";
-type CheckoutField = "name" | "phone" | "address" | "comment";
+type CheckoutField = "name" | "email" | "phone" | "address" | "comment";
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
@@ -109,6 +109,7 @@ export const CartModal = ({
   const [view, setView] = useState<CartModalView>("cart");
   const [checkoutForm, setCheckoutForm] = useState({
     name: "",
+    email: "",
     phone: "",
     address: "",
     comment: "",
@@ -117,6 +118,7 @@ export const CartModal = ({
     Record<CheckoutField, boolean>
   >({
     name: false,
+    email: false,
     phone: false,
     address: false,
     comment: false,
@@ -127,13 +129,20 @@ export const CartModal = ({
 
   const trimmedForm = {
     name: checkoutForm.name.trim(),
+    email: checkoutForm.email.trim(),
     phone: checkoutForm.phone.trim(),
     address: checkoutForm.address.trim(),
     comment: checkoutForm.comment.trim(),
   };
   const phoneDigitsCount = trimmedForm.phone.replace(/\D/g, "").length;
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedForm.email);
   const fieldErrors: Record<CheckoutField, string> = {
     name: trimmedForm.name ? "" : "Укажите имя",
+    email: trimmedForm.email
+      ? isEmailValid
+        ? ""
+        : "Введите корректный email"
+      : "Укажите email",
     phone: phoneDigitsCount >= 11 ? "" : "Введите телефон полностью",
     address: trimmedForm.address ? "" : "Укажите адрес доставки",
     comment: "",
@@ -210,12 +219,14 @@ export const CartModal = ({
   const resetCheckoutForm = () => {
     setCheckoutForm({
       name: "",
+      email: "",
       phone: "",
       address: "",
       comment: "",
     });
     setTouchedFields({
       name: false,
+      email: false,
       phone: false,
       address: false,
       comment: false,
@@ -226,6 +237,7 @@ export const CartModal = ({
     if (!isCheckoutFormValid || !cartProducts.length) {
       setTouchedFields({
         name: true,
+        email: true,
         phone: true,
         address: true,
         comment: true,
@@ -240,6 +252,7 @@ export const CartModal = ({
 
       const response = await createOrderRequest({
         customerName: trimmedForm.name,
+        customerEmail: trimmedForm.email,
         customerPhone: trimmedForm.phone,
         deliveryAddress: trimmedForm.address,
         comment: trimmedForm.comment,
@@ -440,6 +453,26 @@ export const CartModal = ({
                       {touchedFields.name && fieldErrors.name ? (
                         <span className={styles.fieldError}>
                           {fieldErrors.name}
+                        </span>
+                      ) : null}
+                    </label>
+
+                    <label className={styles.formField}>
+                      <span>Email</span>
+                      <Input
+                        value={checkoutForm.email}
+                        status={
+                          touchedFields.email && fieldErrors.email ? "error" : ""
+                        }
+                        onBlur={() => touchField("email")}
+                        onChange={(event) =>
+                          updateFieldValue("email", event.target.value)
+                        }
+                        placeholder="mail@example.com"
+                      />
+                      {touchedFields.email && fieldErrors.email ? (
+                        <span className={styles.fieldError}>
+                          {fieldErrors.email}
                         </span>
                       ) : null}
                     </label>

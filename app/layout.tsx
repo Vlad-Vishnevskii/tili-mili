@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Header, Footer } from "./components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { QueryProvider } from "./providers/query-provider";
+import { CartProvider } from "./providers/cart-provider";
 import styles from "./page.module.css";
 
 const geistSans = Geist({
@@ -37,9 +38,11 @@ export default function RootLayout({
       >
         <AntdRegistry>
           <QueryProvider>
-            <Header />
-            <main className={styles.main}>{children}</main>
-            <Footer />
+            <CartProvider>
+              <Header />
+              <main className={styles.main}>{children}</main>
+              <Footer />
+            </CartProvider>
           </QueryProvider>
         </AntdRegistry>
       </body>

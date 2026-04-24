@@ -72,6 +72,7 @@ export const ProductPageClient = ({ productSlug }: ProductPageClientProps) => {
           </div>
 
           <PurchaseControls
+            productId={currentProduct.id}
             unitPrice={currentProduct.price}
             unitName={currentProduct.unit.name}
             unitValue={currentProduct.unit.value}

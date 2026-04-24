@@ -14,6 +14,7 @@ import {
   PlusOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
+import { createOrderRequest } from "@/app/lib/order-requests";
 import styles from "./cart-modal.module.css";
 
 const CART_MODAL_DISCLAIMER =
@@ -45,6 +46,7 @@ type CartModalProps = {
   onClearCart: () => void;
   onClose: () => void;
   onRemoveItem: (productId: number) => void;
+  onSubmitSuccess: () => void;
   onUpdateQuantity: (productId: number, nextQuantity: number) => void;
   totalItems: number;
   totalPrice: number;
@@ -98,6 +100,7 @@ export const CartModal = ({
   onClearCart,
   onClose,
   onRemoveItem,
+  onSubmitSuccess,
   onUpdateQuantity,
   totalItems,
   totalPrice,
@@ -118,6 +121,9 @@ export const CartModal = ({
     address: false,
     comment: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const trimmedForm = {
     name: checkoutForm.name.trim(),
@@ -138,6 +144,8 @@ export const CartModal = ({
 
   const handleRequestClose = useCallback(() => {
     setView("cart");
+    setSubmitMessage(null);
+    setSubmitError(null);
     onClose();
   }, [onClose]);
 
@@ -190,6 +198,76 @@ export const CartModal = ({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleRequestClose, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsSubmitting(false);
+      setSubmitMessage(null);
+      setSubmitError(null);
+    }
+  }, [isOpen]);
+
+  const resetCheckoutForm = () => {
+    setCheckoutForm({
+      name: "",
+      phone: "",
+      address: "",
+      comment: "",
+    });
+    setTouchedFields({
+      name: false,
+      phone: false,
+      address: false,
+      comment: false,
+    });
+  };
+
+  const submitOrder = async () => {
+    if (!isCheckoutFormValid || !cartProducts.length) {
+      setTouchedFields({
+        name: true,
+        phone: true,
+        address: true,
+        comment: true,
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setSubmitMessage(null);
+      setSubmitError(null);
+
+      const response = await createOrderRequest({
+        customerName: trimmedForm.name,
+        customerPhone: trimmedForm.phone,
+        deliveryAddress: trimmedForm.address,
+        comment: trimmedForm.comment,
+        items: cartProducts.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          packageWeight: item.packageWeight,
+        })),
+      });
+
+      setSubmitMessage(
+        response?.orderNumber
+          ? `Заявка отправлена. Номер: ${response.orderNumber}`
+          : "Заявка отправлена. Мы скоро свяжемся с вами.",
+      );
+      resetCheckoutForm();
+      onSubmitSuccess();
+      setView("cart");
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Не удалось отправить заявку. Попробуйте еще раз.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (typeof document === "undefined" || !isOpen) {
     return null;
@@ -457,23 +535,24 @@ export const CartModal = ({
                 className={styles.checkoutButton}
                 disabled={
                   !cartProducts.length ||
+                  isSubmitting ||
                   (view === "checkout" && !isCheckoutFormValid)
                 }
                 onClick={() => {
                   if (view === "cart") {
                     setView("checkout");
+                    setSubmitError(null);
                     return;
                   }
 
-                  setTouchedFields({
-                    name: true,
-                    phone: true,
-                    address: true,
-                    comment: true,
-                  });
+                  void submitOrder();
                 }}
               >
-                {view === "cart" ? "Оформить заявку" : "Отправить заявку"}
+                {view === "cart"
+                  ? "Оформить заявку"
+                  : isSubmitting
+                    ? "Отправка..."
+                    : "Отправить заявку"}
               </Button>
 
               <span className={styles.summaryHint}>
@@ -481,10 +560,16 @@ export const CartModal = ({
                   ? "Минимальная сумма заявки 900 ₽"
                   : "После отправки мы свяжемся с вами для подтверждения"}
               </span>
+              {submitMessage ? (
+                <span className={styles.submitSuccess}>{submitMessage}</span>
+              ) : null}
+              {submitError ? (
+                <span className={styles.submitError}>{submitError}</span>
+              ) : null}
             </aside>
           </div>
 
-          {cartProducts.length && view === "cart" ? (
+          {cartProducts.length > 0 && view === "cart" ? (
             <div className={styles.modalFooter}>
               <button
                 type="button"

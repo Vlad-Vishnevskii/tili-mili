@@ -16,21 +16,15 @@ import styles from "./styles.module.css";
 import {
   FREE_DELIVERY_THRESHOLD,
   HEADER_IMG_PATHS,
-  MOCK_CART_ITEMS,
 } from "./constants";
 import { CartModal } from "./cart-modal";
 import {
   useCategoriesQuery,
   useProductsQuery,
 } from "@/app/lib/catalog-queries";
+import { useCart } from "@/app/providers/cart-provider";
 
 const DESKTOP_NAV_SCROLL_STEP = 280;
-
-type CartItem = {
-  productId: number;
-  quantity: number;
-  packageWeight: number;
-};
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
@@ -41,13 +35,16 @@ export const Header = () => {
   const pathname = usePathname();
   const { data: categories = [] } = useCategoriesQuery();
   const { data: products = [] } = useProductsQuery();
+  const {
+    cartItems,
+    clearCart,
+    removeCartItem,
+    updateCartItemQuantity,
+  } = useCart();
   const desktopNavRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>(() =>
-    MOCK_CART_ITEMS.map((item) => ({ ...item })),
-  );
 
   const cartProducts = cartItems
     .map((item) => {
@@ -131,28 +128,6 @@ export const Header = () => {
           : DESKTOP_NAV_SCROLL_STEP,
       behavior: "smooth",
     });
-  };
-
-  const updateCartItemQuantity = (productId: number, nextQuantity: number) => {
-    setCartItems((current) =>
-      current
-        .map((item) =>
-          item.productId === productId
-            ? { ...item, quantity: nextQuantity }
-            : item,
-        )
-        .filter((item) => item.quantity > 0),
-    );
-  };
-
-  const removeCartItem = (productId: number) => {
-    setCartItems((current) =>
-      current.filter((item) => item.productId !== productId),
-    );
-  };
-
-  const clearCart = () => {
-    setCartItems([]);
   };
 
   return (
@@ -379,6 +354,7 @@ export const Header = () => {
         onClearCart={clearCart}
         onClose={() => setIsCartOpen(false)}
         onRemoveItem={removeCartItem}
+        onSubmitSuccess={clearCart}
         onUpdateQuantity={updateCartItemQuantity}
         totalItems={totalItems}
         totalPrice={totalPrice}

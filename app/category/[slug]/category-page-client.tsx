@@ -156,6 +156,7 @@ export const CategoryPageClient = ({
 
                 <div className={styles.cardFooter}>
                   <ProductCardPurchase
+                    productId={card.id}
                     productLink={card.link}
                     unitPrice={card.price}
                     unitName={card.unit.name}

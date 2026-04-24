@@ -45,19 +45,21 @@ export default function Home() {
         {isError ? <p>Не удалось загрузить категории.</p> : null}
 
         <div className={styles.categoryList}>
-          {categories.map((item, index) => (
+          {categories.map((item) => (
             <Link
               className={styles.categoryItem}
               key={item.id}
               href={item.link}
             >
               <div className={styles.categoryImageWrap}>
-                <Image src={item.img} width={220} height={220} alt={item.name} />
+                <Image
+                  src={item.img}
+                  width={220}
+                  height={220}
+                  alt={item.name}
+                />
               </div>
               <div className={styles.categoryBody}>
-                <span className={styles.categoryIndex}>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <strong>{item.name}</strong>
                 <p>{CATEGORY_CARD_COPY}</p>
               </div>

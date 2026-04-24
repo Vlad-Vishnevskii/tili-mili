@@ -2,9 +2,11 @@
 
 import { Button } from "antd";
 import { useState } from "react";
+import { useCart } from "@/app/providers/cart-provider";
 import styles from "./styles.module.css";
 
 type PurchaseControlsProps = {
+  productId: number;
   unitPrice: number;
   unitName: string;
   unitValue: number;
@@ -20,6 +22,7 @@ const formatPrice = (value: number) =>
   }).format(Math.round(value));
 
 export const PurchaseControls = ({
+  productId,
   unitPrice,
   unitName,
   unitValue,
@@ -28,6 +31,7 @@ export const PurchaseControls = ({
 }: PurchaseControlsProps) => {
   const [portionCount, setPortionCount] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const { addToCart } = useCart();
 
   const totalWeight = packageWeight * portionCount;
   const totalPrice = (unitPrice / unitValue) * totalWeight;
@@ -94,7 +98,14 @@ export const PurchaseControls = ({
       <div className={styles.purchaseActions}>
         <Button
           className={`${styles.buyBtn} ${isAddedToCart ? styles.buyBtnActive : ""}`}
-          onClick={() => setIsAddedToCart(true)}
+          onClick={() => {
+            addToCart({
+              productId,
+              quantity: portionCount,
+              packageWeight,
+            });
+            setIsAddedToCart(true);
+          }}
           aria-pressed={isAddedToCart}
         >
           {isAddedToCart

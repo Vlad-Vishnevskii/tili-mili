@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { QUERY_STALE_TIME } from "@/app/constants";
+import { API_BASE_URL, QUERY_STALE_TIME } from "@/app/constants";
 import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
 
 const fetchCatalog = async <T>(path: string): Promise<T> => {
-  const response = await fetch(path, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       Accept: "application/json",
     },

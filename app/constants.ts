@@ -1,5 +1,16 @@
-export const STRAPI_URL =
-  process.env.NEXT_PUBLIC_STRAPI_URL ?? "http://localhost:1337";
+const removeTrailingSlash = (value: string) => value.replace(/\/+$/, "");
+
+const DEFAULT_STRAPI_URL = "http://72.56.6.211:1337";
+
+export const STRAPI_URL = removeTrailingSlash(
+  process.env.STRAPI_URL ??
+    process.env.NEXT_PUBLIC_STRAPI_URL ??
+    DEFAULT_STRAPI_URL,
+);
+
+export const API_BASE_URL = removeTrailingSlash(
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
+);
 
 export const QUERY_STALE_TIME = 1000 * 60 * 5;
 

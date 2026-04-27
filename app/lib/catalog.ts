@@ -4,6 +4,7 @@ import {
   DEFAULT_PRODUCT_IMAGE,
   PRODUCT_FALLBACK_IMAGES,
 } from "@/app/constants";
+import { STRAPI_URL } from "@/app/constants";
 
 type StrapiImageFormat = {
   url?: string | null;
@@ -113,17 +114,45 @@ export type StrapiCollectionResponse<T> = {
   data: T[];
 };
 
+const resolveStrapiMediaUrl = (value?: string | null) => {
+  if (!value) {
+    return null;
+  }
+
+  if (value.startsWith("/")) {
+    return `${STRAPI_URL}${value}`;
+  }
+
+  try {
+    const assetUrl = new URL(value);
+    const strapiUrl = new URL(STRAPI_URL);
+
+    if (
+      assetUrl.hostname === "localhost" ||
+      assetUrl.hostname === "127.0.0.1" ||
+      assetUrl.pathname.startsWith("/uploads/")
+    ) {
+      assetUrl.protocol = strapiUrl.protocol;
+      assetUrl.host = strapiUrl.host;
+    }
+
+    return assetUrl.toString();
+  } catch {
+    return value;
+  }
+};
+
 const getImageUrl = (image?: StrapiImage | null) => {
   if (!image) {
     return null;
   }
 
-  return (
+  return resolveStrapiMediaUrl(
     image.formats?.medium?.url ??
-    image.formats?.small?.url ??
-    image.formats?.thumbnail?.url ??
-    image.url ??
-    null
+      image.formats?.small?.url ??
+      image.formats?.thumbnail?.url ??
+      image.url ??
+      null,
   );
 };
 

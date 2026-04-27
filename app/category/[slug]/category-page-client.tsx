@@ -1,24 +1,20 @@
-"use client";
-
 import { Button } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
-import { useCategoriesQuery, useProductsQuery } from "@/app/lib/catalog-queries";
+import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
 import { ProductCardPurchase } from "./product-card-purchase";
 import styles from "./styles.module.css";
 
 type CategoryPageClientProps = {
-  categorySlug: string;
+  category: CatalogCategory | null;
+  products: CatalogProduct[];
 };
 
 export const CategoryPageClient = ({
-  categorySlug,
+  category,
+  products,
 }: CategoryPageClientProps) => {
-  const { data: categories = [], isLoading, isError } = useCategoriesQuery();
-  const { data: products = [] } = useProductsQuery();
-
-  const category = categories.find((item) => item.slug === categorySlug);
   const categoryProducts = products.filter(
     (product) => product.category?.id === category?.id,
   );
@@ -29,11 +25,7 @@ export const CategoryPageClient = ({
     ? Math.min(...categoryProducts.map((product) => product.price))
     : null;
 
-  if (isLoading) {
-    return <div className={styles.container}>Загружаем категорию...</div>;
-  }
-
-  if (isError || !category) {
+  if (!category) {
     return (
       <div className={styles.container}>
         <div className={styles.categoryDescription}>
@@ -42,7 +34,9 @@ export const CategoryPageClient = ({
             <h2>Категория не найдена</h2>
           </div>
           <div className={styles.categoryDescriptionBody}>
-            <p>Проверьте данные в Strapi или выберите другой раздел каталога.</p>
+            <p>
+              Проверьте данные в Strapi или выберите другой раздел каталога.
+            </p>
           </div>
         </div>
       </div>

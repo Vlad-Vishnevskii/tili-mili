@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FocusEvent } from "react";
 import Link from "next/link";
 import classnames from "classnames";
 import { usePathname, useRouter } from "next/navigation";
-import { Flex, Button, Input, Dropdown } from "antd";
+import { Flex, Input, Dropdown } from "antd";
 import {
   LeftOutlined,
   PhoneOutlined,
@@ -15,10 +15,6 @@ import Image from "next/image";
 import styles from "./styles.module.css";
 import { FREE_DELIVERY_THRESHOLD, HEADER_IMG_PATHS } from "./constants";
 import { CartModal } from "./cart-modal";
-import {
-  useCategoriesQuery,
-  useProductsQuery,
-} from "@/app/lib/catalog-queries";
 import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
 import { useCart } from "@/app/providers/cart-provider";
 
@@ -93,11 +89,14 @@ const getProductSearchResults = (
       type: "product",
     }));
 
-export const Header = () => {
+type HeaderProps = {
+  categories: CatalogCategory[];
+  products: CatalogProduct[];
+};
+
+export const Header = ({ categories, products }: HeaderProps) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: categories = [] } = useCategoriesQuery();
-  const { data: products = [] } = useProductsQuery();
   const { cartItems, clearCart, removeCartItem, updateCartItemQuantity } =
     useCart();
   const desktopNavRef = useRef<HTMLDivElement | null>(null);
@@ -277,14 +276,9 @@ export const Header = () => {
                   aria-label="Корзина"
                   onClick={() => setIsCartOpen(true)}
                 >
-                  <Button
-                    className={styles.cartButton}
-                    classNames={{ icon: classnames(styles.cartIcon) }}
-                    variant="text"
-                    type="text"
-                    size="large"
-                    icon={<ShoppingCartOutlined />}
-                  />
+                  <span className={styles.cartButton} aria-hidden="true">
+                    <ShoppingCartOutlined className={styles.cartIcon} />
+                  </span>
                   <span className={styles.cartAmount}>{cartAmountLabel}</span>
                 </button>
 
@@ -292,16 +286,9 @@ export const Header = () => {
                   className={classnames(styles.phone, styles.desktopHidden)}
                   href="tel:+79163672825"
                 >
-                  <Button
-                    classNames={{
-                      root: styles.actionButton,
-                      icon: classnames(styles.phone),
-                    }}
-                    variant="text"
-                    type="text"
-                    size="large"
-                    icon={<PhoneOutlined />}
-                  />
+                  <span className={styles.actionButton} aria-hidden="true">
+                    <PhoneOutlined className={styles.phoneIcon} />
+                  </span>
                 </a>
               </Flex>
             </div>
@@ -381,28 +368,16 @@ export const Header = () => {
                 aria-label="Корзина"
                 onClick={() => setIsCartOpen(true)}
               >
-                <Button
-                  className={styles.cartButton}
-                  classNames={{ icon: classnames(styles.cartIcon) }}
-                  variant="text"
-                  type="text"
-                  size="large"
-                  icon={<ShoppingCartOutlined />}
-                />
+                <span className={styles.cartButton} aria-hidden="true">
+                  <ShoppingCartOutlined className={styles.cartIcon} />
+                </span>
                 <span className={styles.cartAmount}>{cartAmountLabel}</span>
               </button>
 
               <a className={styles.phone} href="tel:8800">
-                <Button
-                  classNames={{
-                    root: styles.actionButton,
-                    icon: classnames(styles.phone),
-                  }}
-                  variant="text"
-                  type="text"
-                  size="large"
-                  icon={<PhoneOutlined />}
-                />
+                <span className={styles.actionButton} aria-hidden="true">
+                  <PhoneOutlined className={styles.phoneIcon} />
+                </span>
               </a>
             </Flex>
           </div>

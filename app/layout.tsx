@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Header, Footer } from "./components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { QueryProvider } from "./providers/query-provider";
 import { CartProvider } from "./providers/cart-provider";
+import { getCategories, getProducts } from "./lib/catalog-data";
 import styles from "./page.module.css";
 
 const geistSans = Geist({
@@ -20,30 +20,34 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Деревенская еда TiLi_MiLi",
-  description: "Деревенская еда с доставкой на дом в Москве и Санкт-Петербурге",
+  description:
+    "Деревенская еда с доставкой на дом в Москве и Санкт-Петербурге",
   icons: {
     icon: "/logo_32x32.svg",
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts(),
+  ]);
+
   return (
     <html lang="ru">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${styles.page}`}
       >
         <AntdRegistry>
-          <QueryProvider>
-            <CartProvider>
-              <Header />
-              <main className={styles.main}>{children}</main>
-              <Footer />
-            </CartProvider>
-          </QueryProvider>
+          <CartProvider>
+            <Header categories={categories} products={products} />
+            <main className={styles.main}>{children}</main>
+            <Footer categories={categories} />
+          </CartProvider>
         </AntdRegistry>
       </body>
     </html>

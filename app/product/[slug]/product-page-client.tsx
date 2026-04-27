@@ -1,25 +1,16 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
-import { useProductsQuery } from "@/app/lib/catalog-queries";
+import type { CatalogProduct } from "@/app/lib/catalog";
 import { PurchaseControls } from "./purchase-controls";
 import styles from "./styles.module.css";
 
 type ProductPageClientProps = {
-  productSlug: string;
+  product: CatalogProduct | null;
 };
 
-export const ProductPageClient = ({ productSlug }: ProductPageClientProps) => {
-  const { data: products = [], isLoading, isError } = useProductsQuery();
-  const currentProduct = products.find((item) => item.slug === productSlug);
-
-  if (isLoading) {
-    return <div className={styles.container}>Загружаем товар...</div>;
-  }
-
-  if (isError || !currentProduct) {
+export const ProductPageClient = ({ product }: ProductPageClientProps) => {
+  if (!product) {
     return (
       <div className={styles.container}>
         <div className={styles.notFound}>
@@ -35,22 +26,22 @@ export const ProductPageClient = ({ productSlug }: ProductPageClientProps) => {
       <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
         <Link href="/">Главная</Link>
         <span>/</span>
-        <Link href={currentProduct.category?.link ?? "/"}>Продукция</Link>
+        <Link href={product.category?.link ?? "/"}>Продукция</Link>
         <span>/</span>
-        <span aria-current="page">{currentProduct.name}</span>
+        <span aria-current="page">{product.name}</span>
       </nav>
 
       <section className={styles.productShell}>
         <div className={styles.galleryCard}>
           <div className={styles.imageWrap}>
-            {currentProduct.isOutOfStock ? (
+            {product.isOutOfStock ? (
               <span className={styles.outOfStockBadge}>Нет в наличии</span>
             ) : null}
             <Image
-              src={currentProduct.img}
+              src={product.img}
               width={620}
               height={620}
-              alt={currentProduct.name}
+              alt={product.name}
             />
           </div>
 
@@ -65,27 +56,27 @@ export const ProductPageClient = ({ productSlug }: ProductPageClientProps) => {
         <div className={styles.infoCard}>
           <span className={styles.kicker}>Карточка товара</span>
           <div className={styles.titleBlock}>
-            <h1 className={styles.name}>{currentProduct.name}</h1>
-            {currentProduct.freezeLabel ? (
-              <FreezeBadge label={currentProduct.freezeLabel} />
+            <h1 className={styles.name}>{product.name}</h1>
+            {product.freezeLabel ? (
+              <FreezeBadge label={product.freezeLabel} />
             ) : null}
           </div>
 
           <PurchaseControls
-            productId={currentProduct.id}
-            unitPrice={currentProduct.price}
-            unitName={currentProduct.unit.name}
-            unitValue={currentProduct.unit.value}
-            isOutOfStock={currentProduct.isOutOfStock}
+            productId={product.id}
+            unitPrice={product.price}
+            unitName={product.unit.name}
+            unitValue={product.unit.value}
+            isOutOfStock={product.isOutOfStock}
           />
 
           <p className={styles.lead}>
-            {currentProduct.description[0]?.text ??
+            {product.description[0]?.text ??
               "Живой фермерский продукт с понятными характеристиками, который удобно заказать как для повседневного рациона, так и для семейного стола."}
           </p>
 
           <ul id="description" className={styles.descriptionList}>
-            {currentProduct.description.map((item) => (
+            {product.description.map((item) => (
               <li key={item.name} className={styles.descriptionItem}>
                 <strong>{item.name}</strong>
                 <span>{item.text}</span>

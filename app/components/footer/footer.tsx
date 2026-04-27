@@ -9,10 +9,13 @@ import {
 } from "./constants";
 import { Flex } from "antd";
 import Link from "next/link";
-import { useCategoriesQuery } from "@/app/lib/catalog-queries";
+import type { CatalogCategory } from "@/app/lib/catalog";
 
-export const Footer = () => {
-  const { data: categories = [] } = useCategoriesQuery();
+type FooterProps = {
+  categories: CatalogCategory[];
+};
+
+export const Footer = ({ categories }: FooterProps) => {
 
   return (
     <div className={styles.footer}>

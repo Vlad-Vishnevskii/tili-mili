@@ -29,7 +29,7 @@ export const ProductCardPurchase = ({
   unitPrice,
   unitName,
   unitValue,
-  packageWeight = 0.3,
+  packageWeight = unitValue,
   isOutOfStock = false,
 }: ProductCardPurchaseProps) => {
   const [draftPortionCount, setDraftPortionCount] = useState(1);
@@ -38,7 +38,7 @@ export const ProductCardPurchase = ({
 
   const portionCount = cartItem?.quantity ?? draftPortionCount;
   const totalWeight = packageWeight * portionCount;
-  const totalPrice = (unitPrice / unitValue) * totalWeight;
+  const totalPrice = unitPrice * portionCount;
   const isAddedToCart = Boolean(cartItem);
 
   const handlePortionCountChange = (nextPortionCount: number) => {

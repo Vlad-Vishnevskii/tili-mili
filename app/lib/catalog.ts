@@ -5,6 +5,7 @@ import {
   PRODUCT_FALLBACK_IMAGES,
 } from "@/app/constants";
 import { STRAPI_URL } from "@/app/constants";
+import { normalizeSeo, type SiteSeo } from "@/app/lib/site-data";
 
 type StrapiImageFormat = {
   url?: string | null;
@@ -46,7 +47,9 @@ export type StrapiCategory = {
   documentId: string;
   name: string;
   slug: string;
+  sortOrder?: number | null;
   image?: StrapiImage | null;
+  seo?: unknown;
   descriptionBlocks?: StrapiDescriptionBlock[] | null;
   subcategories?: StrapiSubcategory[] | null;
   products?: StrapiProductSummary[] | null;
@@ -64,6 +67,7 @@ export type StrapiProduct = {
   unitValue: number;
   unitName: string;
   image?: StrapiImage | null;
+  seo?: unknown;
   descriptionItems?: StrapiDescriptionItem[] | null;
   category?: StrapiCategoryRelation | null;
 };
@@ -73,9 +77,11 @@ export type CatalogCategory = {
   documentId: string;
   name: string;
   slug: string;
+  sortOrder: number | null;
   link: string;
   img: string;
   categoryDescription: string[];
+  seo: SiteSeo;
   subCategories: Array<{
     id: number;
     label: string;
@@ -94,6 +100,7 @@ export type CatalogProduct = {
   promoLabel?: string;
   freezeLabel?: string;
   isOutOfStock: boolean;
+  seo: SiteSeo;
   unit: {
     value: number;
     name: string;
@@ -114,7 +121,7 @@ export type StrapiCollectionResponse<T> = {
   data: T[];
 };
 
-const resolveStrapiMediaUrl = (value?: string | null) => {
+export const resolveStrapiMediaUrl = (value?: string | null) => {
   if (!value) {
     return null;
   }
@@ -174,23 +181,41 @@ const getProductImage = (
 export const normalizeCategories = (
   categories: StrapiCategory[],
 ): CatalogCategory[] =>
-  categories.map((category) => ({
-    id: category.id,
-    documentId: category.documentId,
-    name: category.name,
-    slug: category.slug,
-    link: `/category/${category.slug}`,
-    img: getCategoryImage(category.slug, category.image),
-    categoryDescription:
-      category.descriptionBlocks?.map((block) => block.text).filter(Boolean) ??
-      [],
-    subCategories:
-      category.subcategories?.map((item) => ({
-        id: item.id,
-        label: item.label,
-      })) ?? [],
-    productIds: category.products?.map((product) => product.id) ?? [],
-  }));
+  [...categories]
+    .sort((left, right) => {
+      const leftSortOrder =
+        typeof left.sortOrder === "number" ? left.sortOrder : Number.POSITIVE_INFINITY;
+      const rightSortOrder =
+        typeof right.sortOrder === "number"
+          ? right.sortOrder
+          : Number.POSITIVE_INFINITY;
+
+      if (leftSortOrder !== rightSortOrder) {
+        return leftSortOrder - rightSortOrder;
+      }
+
+      return left.name.localeCompare(right.name, "ru");
+    })
+    .map((category) => ({
+      id: category.id,
+      documentId: category.documentId,
+      name: category.name,
+      slug: category.slug,
+      sortOrder:
+        typeof category.sortOrder === "number" ? category.sortOrder : null,
+      link: `/category/${category.slug}`,
+      img: getCategoryImage(category.slug, category.image),
+      seo: normalizeSeo(category.seo),
+      categoryDescription:
+        category.descriptionBlocks?.map((block) => block.text).filter(Boolean) ??
+        [],
+      subCategories:
+        category.subcategories?.map((item) => ({
+          id: item.id,
+          label: item.label,
+        })) ?? [],
+      productIds: category.products?.map((product) => product.id) ?? [],
+    }));
 
 export const normalizeProducts = (products: StrapiProduct[]): CatalogProduct[] =>
   products.map((product) => ({
@@ -204,6 +229,7 @@ export const normalizeProducts = (products: StrapiProduct[]): CatalogProduct[] =
     promoLabel: product.promoLabel ?? undefined,
     freezeLabel: product.freezeLabel ?? undefined,
     isOutOfStock: Boolean(product.isOutOfStock),
+    seo: normalizeSeo(product.seo),
     unit: {
       value: product.unitValue,
       name: product.unitName,

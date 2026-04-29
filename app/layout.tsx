@@ -6,6 +6,7 @@ import { Header, Footer } from "./components";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { CartProvider } from "./providers/cart-provider";
 import { getCategories, getProducts } from "./lib/catalog-data";
+import { buildMetadata, getSiteSettings } from "./lib/site-data";
 import styles from "./page.module.css";
 
 const geistSans = Geist({
@@ -18,23 +19,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Деревенская еда TiLi_MiLi",
-  description:
-    "Деревенская еда с доставкой на дом в Москве и Санкт-Петербурге",
-  icons: {
-    icon: "/logo_32x32.svg",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSettings = await getSiteSettings();
+
+  return buildMetadata({
+    seo: siteSettings.defaultSeo,
+    titleFallback: siteSettings.siteName,
+    descriptionFallback: siteSettings.siteDescription,
+    siteName: siteSettings.siteName,
+    faviconUrl: siteSettings.faviconUrl,
+  });
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, products] = await Promise.all([
+  const [categories, products, siteSettings] = await Promise.all([
     getCategories(),
     getProducts(),
+    getSiteSettings(),
   ]);
 
   return (
@@ -44,9 +49,13 @@ export default async function RootLayout({
       >
         <AntdRegistry>
           <CartProvider>
-            <Header categories={categories} products={products} />
+            <Header
+              categories={categories}
+              products={products}
+              siteSettings={siteSettings}
+            />
             <main className={styles.main}>{children}</main>
-            <Footer categories={categories} />
+            <Footer categories={categories} siteSettings={siteSettings} />
           </CartProvider>
         </AntdRegistry>
       </body>

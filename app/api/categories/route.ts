@@ -10,12 +10,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const response = await fetch(`${STRAPI_URL}/api/categories?populate=*`, {
+    const response = await fetch(
+      `${STRAPI_URL}/api/categories?populate=*&sort=sortOrder:asc`,
+      {
       cache: "no-store",
       headers: {
         Accept: "application/json",
       },
-    });
+      },
+    );
 
     if (!response.ok) {
       return NextResponse.json(

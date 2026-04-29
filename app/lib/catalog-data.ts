@@ -1,5 +1,4 @@
-import { cache } from "react";
-import { QUERY_STALE_TIME, STRAPI_URL } from "@/app/constants";
+import { STRAPI_URL } from "@/app/constants";
 import {
   normalizeCategories,
   normalizeProducts,
@@ -10,15 +9,11 @@ import {
   type StrapiProduct,
 } from "@/app/lib/catalog";
 
-const CATALOG_REVALIDATE_SECONDS = QUERY_STALE_TIME / 1000;
-
 const fetchCatalogCollection = async <T>(path: string) => {
   const response = await fetch(`${STRAPI_URL}${path}`, {
+    cache: "no-store",
     headers: {
       Accept: "application/json",
-    },
-    next: {
-      revalidate: CATALOG_REVALIDATE_SECONDS,
     },
   });
 
@@ -29,18 +24,18 @@ const fetchCatalogCollection = async <T>(path: string) => {
   return (await response.json()) as StrapiCollectionResponse<T>;
 };
 
-export const getCategories = cache(async (): Promise<CatalogCategory[]> => {
+export const getCategories = async (): Promise<CatalogCategory[]> => {
   const payload = await fetchCatalogCollection<StrapiCategory>(
-    "/api/categories?populate=*",
+    "/api/categories?populate=*&sort=sortOrder:asc",
   );
 
   return normalizeCategories(payload.data);
-});
+};
 
-export const getProducts = cache(async (): Promise<CatalogProduct[]> => {
+export const getProducts = async (): Promise<CatalogProduct[]> => {
   const payload = await fetchCatalogCollection<StrapiProduct>(
     "/api/products?populate=*",
   );
 
   return normalizeProducts(payload.data);
-});
+};

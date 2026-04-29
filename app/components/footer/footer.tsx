@@ -10,12 +10,100 @@ import {
 import { Flex } from "antd";
 import Link from "next/link";
 import type { CatalogCategory } from "@/app/lib/catalog";
+import type { SiteSettings, SiteSocialLink } from "@/app/lib/site-data";
 
 type FooterProps = {
   categories: CatalogCategory[];
+  siteSettings: SiteSettings;
 };
 
-export const Footer = ({ categories }: FooterProps) => {
+const DEFAULT_PHONE_NUMBER = "+7(916)-367-28-25";
+const DEFAULT_EMAIL = "fermatilimili@yandex.ru";
+
+const toPhoneHref = (value: string) => `tel:${value.replace(/[^\d+]/g, "")}`;
+
+const getSocialKey = (social: SiteSocialLink) =>
+  social.id.toLowerCase() || social.label.toLowerCase();
+
+const SocialIcon = ({ social }: { social: SiteSocialLink }) => {
+  const socialKey = getSocialKey(social);
+
+  if (socialKey.includes("vk")) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={styles.socialIcon}
+        aria-hidden="true"
+      >
+        <path
+          d="M4 7.5C4.12 13.02 6.88 16.33 11.72 16.5V13.37C13.45 13.54 14.76 14.8 15.29 16.5H18C17.32 14 15.52 12.62 14.39 12.09C15.52 11.44 17.08 9.86 17.46 7.5H15C14.5 9.42 13.06 11 11.72 11.16V7.5H9.27V13.92C7.91 13.58 6.19 11.88 6.11 7.5H4Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+
+  if (socialKey.includes("insta")) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={styles.socialIcon}
+        aria-hidden="true"
+      >
+        <rect
+          x="4.25"
+          y="4.25"
+          width="15.5"
+          height="15.5"
+          rx="4.75"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <circle
+          cx="12"
+          cy="12"
+          r="3.6"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+        <circle cx="17.35" cy="6.65" r="1.1" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  if (socialKey.includes("telegram") || socialKey.includes("tg")) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={styles.socialIcon}
+        aria-hidden="true"
+      >
+        <path
+          d="M20.45 5.06L3.93 11.43C2.8 11.88 2.81 12.51 3.72 12.79L7.96 14.11L17.78 7.91C18.24 7.63 18.66 7.78 18.31 8.09L10.35 15.27L10.06 19.44C10.48 19.44 10.67 19.25 10.9 19.03L12.96 17.03L17.24 20.19C18.03 20.62 18.59 20.4 18.79 19.46L21.6 6.22C21.89 5.07 21.16 4.55 20.45 5.06Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+
+  return <span>{social.label.slice(0, 2).toUpperCase()}</span>;
+};
+
+export const Footer = ({ categories, siteSettings }: FooterProps) => {
+  const phone =
+    siteSettings.contacts?.phone ??
+    siteSettings.contacts?.secondaryPhone ??
+    DEFAULT_PHONE_NUMBER;
+  const email = siteSettings.contacts?.email ?? DEFAULT_EMAIL;
+  const socialLinks = siteSettings.socialLinks.length
+    ? siteSettings.socialLinks
+    : [...FOOTER_SOCIALS];
 
   return (
     <div className={styles.footer}>
@@ -43,10 +131,10 @@ export const Footer = ({ categories }: FooterProps) => {
 
         <Flex className={styles.contacts}>
           <h3>Контакты</h3>
-          <a href="tel:+79163672825">+7(916)-367-28-25</a>
-          <a href="mailto:fermatilimili@yandex.ru">fermatilimili@yandex.ru</a>
+          <a href={toPhoneHref(phone)}>{phone}</a>
+          <a href={`mailto:${email}`}>{email}</a>
           <div className={styles.socials}>
-            {FOOTER_SOCIALS.map((social) => (
+            {socialLinks.map((social) => (
               <a
                 key={social.id}
                 href={social.href}
@@ -55,61 +143,7 @@ export const Footer = ({ categories }: FooterProps) => {
                 aria-label={social.label}
                 className={styles.socialLink}
               >
-                {social.id === "vk" ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={styles.socialIcon}
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M4 7.5C4.12 13.02 6.88 16.33 11.72 16.5V13.37C13.45 13.54 14.76 14.8 15.29 16.5H18C17.32 14 15.52 12.62 14.39 12.09C15.52 11.44 17.08 9.86 17.46 7.5H15C14.5 9.42 13.06 11 11.72 11.16V7.5H9.27V13.92C7.91 13.58 6.19 11.88 6.11 7.5H4Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                ) : null}
-                {social.id === "instagram" ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={styles.socialIcon}
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="4.25"
-                      y="4.25"
-                      width="15.5"
-                      height="15.5"
-                      rx="4.75"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="3.6"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                    <circle cx="17.35" cy="6.65" r="1.1" fill="currentColor" />
-                  </svg>
-                ) : null}
-                {social.id === "telegram" ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={styles.socialIcon}
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M20.45 5.06L3.93 11.43C2.8 11.88 2.81 12.51 3.72 12.79L7.96 14.11L17.78 7.91C18.24 7.63 18.66 7.78 18.31 8.09L10.35 15.27L10.06 19.44C10.48 19.44 10.67 19.25 10.9 19.03L12.96 17.03L17.24 20.19C18.03 20.62 18.59 20.4 18.79 19.46L21.6 6.22C21.89 5.07 21.16 4.55 20.45 5.06Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                ) : null}
+                <SocialIcon social={social} />
               </a>
             ))}
           </div>

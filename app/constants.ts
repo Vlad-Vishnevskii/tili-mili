@@ -8,6 +8,14 @@ export const STRAPI_URL = removeTrailingSlash(
     DEFAULT_STRAPI_URL,
 );
 
+export const SITE_URL = removeTrailingSlash(
+  process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "",
+);
+
+export const STRAPI_SITE_SETTINGS_PATH = "/api/site-setting?populate=*";
+
+export const STRAPI_HOME_PAGE_PATH = "/api/home-page?populate=*";
+
 export const API_BASE_URL = removeTrailingSlash(
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
 );

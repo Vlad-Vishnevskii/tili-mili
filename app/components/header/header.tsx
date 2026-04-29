@@ -16,15 +16,20 @@ import styles from "./styles.module.css";
 import { FREE_DELIVERY_THRESHOLD, HEADER_IMG_PATHS } from "./constants";
 import { CartModal } from "./cart-modal";
 import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
+import type { SiteSettings } from "@/app/lib/site-data";
 import { useCart } from "@/app/providers/cart-provider";
 
 const DESKTOP_NAV_SCROLL_STEP = 280;
 const SEARCH_RESULTS_LIMIT = 8;
+const DEFAULT_PHONE_NUMBER = "+79163672825";
+const DEFAULT_PROMO_TEXT = "Фермерские продукты из деревни";
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
     maximumFractionDigits: 0,
   }).format(Math.round(value));
+
+const toPhoneHref = (value: string) => `tel:${value.replace(/[^\d+]/g, "")}`;
 
 type SearchResult = {
   id: string;
@@ -58,7 +63,7 @@ const getCategorySearchResults = (
       title: category.name,
       subtitle: "Категория",
       link: category.link,
-      type: "category",
+      type: "category" as const,
     }));
 
 const getProductSearchResults = (
@@ -86,15 +91,16 @@ const getProductSearchResults = (
         ? `Товар • ${product.category.name}`
         : "Товар",
       link: product.link,
-      type: "product",
+      type: "product" as const,
     }));
 
 type HeaderProps = {
   categories: CatalogCategory[];
   products: CatalogProduct[];
+  siteSettings: SiteSettings;
 };
 
-export const Header = ({ categories, products }: HeaderProps) => {
+export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const { cartItems, clearCart, removeCartItem, updateCartItemQuantity } =
@@ -128,7 +134,7 @@ export const Header = ({ categories, products }: HeaderProps) => {
 
       const unitPrice = Number(product.price);
       const itemWeight = item.packageWeight * item.quantity;
-      const itemTotal = unitPrice * item.packageWeight * item.quantity;
+      const itemTotal = unitPrice * item.quantity;
 
       return {
         ...item,
@@ -153,6 +159,12 @@ export const Header = ({ categories, products }: HeaderProps) => {
     0,
   );
   const cartAmountLabel = totalItems ? `${formatPrice(totalPrice)} ₽` : "";
+  const primaryPhone =
+    siteSettings.contacts?.phone ??
+    siteSettings.contacts?.secondaryPhone ??
+    DEFAULT_PHONE_NUMBER;
+  const promoText = siteSettings.promoText ?? DEFAULT_PROMO_TEXT;
+  const phoneHref = toPhoneHref(primaryPhone);
 
   useEffect(() => {
     const navElement = desktopNavRef.current;
@@ -262,9 +274,7 @@ export const Header = ({ categories, products }: HeaderProps) => {
 
               <Flex align="center" className={styles.rightIcons}>
                 <div className={styles.brandText}>
-                  <span className={styles.brandEyebrow}>
-                    Фермерские продукты из деревни
-                  </span>
+                  <span className={styles.brandEyebrow}>{promoText}</span>
                 </div>
                 <button
                   type="button"
@@ -284,7 +294,7 @@ export const Header = ({ categories, products }: HeaderProps) => {
 
                 <a
                   className={classnames(styles.phone, styles.desktopHidden)}
-                  href="tel:+79163672825"
+                  href={phoneHref}
                 >
                   <span className={styles.actionButton} aria-hidden="true">
                     <PhoneOutlined className={styles.phoneIcon} />
@@ -374,7 +384,7 @@ export const Header = ({ categories, products }: HeaderProps) => {
                 <span className={styles.cartAmount}>{cartAmountLabel}</span>
               </button>
 
-              <a className={styles.phone} href="tel:8800">
+              <a className={styles.phone} href={phoneHref}>
                 <span className={styles.actionButton} aria-hidden="true">
                   <PhoneOutlined className={styles.phoneIcon} />
                 </span>

@@ -61,15 +61,25 @@ const readStoredCart = (): CartItem[] => {
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(readStoredCart);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isStorageReady, setIsStorageReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    const timeoutId = window.setTimeout(() => {
+      setCartItems(readStoredCart());
+      setIsStorageReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
+    if (!isStorageReady || typeof window === "undefined") {
       return;
     }
 
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems]);
+  }, [cartItems, isStorageReady]);
 
   const value = useMemo<CartContextValue>(
     () => ({

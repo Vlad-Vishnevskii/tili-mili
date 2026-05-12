@@ -43,6 +43,8 @@ export type SiteSettings = {
   contacts: SiteContacts | null;
   socialLinks: SiteSocialLink[];
   promoText?: string;
+  deliveryDateSpb: string | null;
+  deliveryDateMsk: string | null;
 };
 
 export type HomeHeroBanner = {
@@ -368,6 +370,8 @@ const getFallbackSiteSettings = (): SiteSettings => ({
   },
   contacts: null,
   socialLinks: [],
+  deliveryDateSpb: null,
+  deliveryDateMsk: null,
 });
 
 const getFallbackHomePage = (): HomePageData => ({
@@ -411,6 +415,8 @@ export const getSiteSettings = async (): Promise<SiteSettings> => {
       contacts: normalizeContacts(payload.contacts),
       socialLinks: normalizeSocialLinks(payload.socialLinks),
       promoText: getString(payload.promoText),
+      deliveryDateSpb: getString(payload.deliveryDateSpb) ?? null,
+      deliveryDateMsk: getString(payload.deliveryDateMsk) ?? null,
     };
   } catch {
     return getFallbackSiteSettings();

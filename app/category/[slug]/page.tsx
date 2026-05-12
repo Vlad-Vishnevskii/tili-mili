@@ -27,13 +27,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const CategoryPage = async ({ params }: Props) => {
   const { slug } = await params;
-  const [categories, products] = await Promise.all([
+  const [categories, products, siteSettings] = await Promise.all([
     getCategories(),
     getProducts(),
+    getSiteSettings(),
   ]);
   const category = categories.find((item) => item.slug === slug) ?? null;
 
-  return <CategoryPageClient category={category} products={products} />;
+  return (
+    <CategoryPageClient
+      category={category}
+      products={products}
+      siteSettings={siteSettings}
+    />
+  );
 };
 
 export default CategoryPage;

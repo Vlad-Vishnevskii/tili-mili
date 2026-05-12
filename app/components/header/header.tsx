@@ -79,6 +79,7 @@ const getProductSearchResults = (
           product.category?.name ?? "",
           product.freezeLabel ?? "",
           product.promoLabel ?? "",
+          product.dietLabel ?? "",
         ].join(" "),
       );
 

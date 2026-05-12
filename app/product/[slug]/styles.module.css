@@ -147,6 +147,50 @@
   gap: 12px;
 }
 
+.labelList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.promoBadge,
+.dietBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  max-width: 100%;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  box-shadow:
+    0 12px 28px rgba(96, 125, 131, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.promoBadge {
+  background:
+    linear-gradient(180deg, rgba(227, 58, 74, 0.98), rgba(189, 23, 42, 0.98));
+}
+
+.dietBadge {
+  border: 1px solid rgba(96, 125, 131, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 247, 241, 0.94)),
+    rgba(255, 255, 255, 0.94);
+  color: #4f7a59;
+  box-shadow:
+    0 12px 28px rgba(96, 125, 131, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
 .priceRow {
   display: flex;
   justify-content: space-between;
@@ -187,6 +231,25 @@
   color: #666666;
   line-height: 1.7;
   font-size: 16px;
+}
+
+.deliveryDates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.deliveryDate {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background-color: rgba(96, 125, 131, 0.1);
+  color: #3f555a;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .descriptionList {

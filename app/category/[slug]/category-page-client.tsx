@@ -3,17 +3,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
 import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
+import { getDeliveryDateItems } from "@/app/lib/delivery-dates";
+import type { SiteSettings } from "@/app/lib/site-data";
 import { ProductCardPurchase } from "./product-card-purchase";
 import styles from "./styles.module.css";
 
 type CategoryPageClientProps = {
   category: CatalogCategory | null;
   products: CatalogProduct[];
+  siteSettings: Pick<SiteSettings, "deliveryDateSpb" | "deliveryDateMsk">;
 };
 
 export const CategoryPageClient = ({
   category,
   products,
+  siteSettings,
 }: CategoryPageClientProps) => {
   const categoryProducts = products.filter(
     (product) => product.category?.id === category?.id,
@@ -24,6 +28,7 @@ export const CategoryPageClient = ({
   const minPrice = categoryProducts.length
     ? Math.min(...categoryProducts.map((product) => product.price))
     : null;
+  const deliveryDates = getDeliveryDateItems(siteSettings);
 
   if (!category) {
     return (
@@ -119,8 +124,20 @@ export const CategoryPageClient = ({
           {categoryProducts.map((card) => (
             <article className={styles.card} key={card.id}>
               <Link href={card.link} className={styles.cardImageWrap}>
-                {card.promoLabel ? (
-                  <span className={styles.promoBadge}>{card.promoLabel}</span>
+                {card.promoLabel || card.dietLabel ? (
+                  <div className={styles.imageBadgeStack}>
+                    {card.promoLabel ? (
+                      <span className={styles.promoBadge}>
+                        {card.promoLabel}
+                      </span>
+                    ) : null}
+
+                    {card.dietLabel ? (
+                      <span className={styles.dietBadge}>
+                        {card.dietLabel}
+                      </span>
+                    ) : null}
+                  </div>
                 ) : null}
 
                 {card.isOutOfStock ? (
@@ -147,6 +164,16 @@ export const CategoryPageClient = ({
                   {card.description[0]?.text ??
                     "Свежий продукт с аккуратной подготовкой и понятным составом."}
                 </p>
+
+                {deliveryDates.length ? (
+                  <div className={styles.deliveryDates}>
+                    {deliveryDates.map((item) => (
+                      <span key={item.city} className={styles.deliveryDate}>
+                        {item.city}: {item.date}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
 
                 <div className={styles.cardFooter}>
                   <ProductCardPurchase

@@ -2,14 +2,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
 import type { CatalogProduct } from "@/app/lib/catalog";
+import { getDeliveryDateItems } from "@/app/lib/delivery-dates";
+import type { SiteSettings } from "@/app/lib/site-data";
 import { PurchaseControls } from "./purchase-controls";
 import styles from "./styles.module.css";
 
 type ProductPageClientProps = {
   product: CatalogProduct | null;
+  siteSettings: Pick<SiteSettings, "deliveryDateSpb" | "deliveryDateMsk">;
 };
 
-export const ProductPageClient = ({ product }: ProductPageClientProps) => {
+export const ProductPageClient = ({
+  product,
+  siteSettings,
+}: ProductPageClientProps) => {
+  const deliveryDates = getDeliveryDateItems(siteSettings);
+
   if (!product) {
     return (
       <div className={styles.container}>
@@ -57,8 +65,22 @@ export const ProductPageClient = ({ product }: ProductPageClientProps) => {
           <span className={styles.kicker}>Карточка товара</span>
           <div className={styles.titleBlock}>
             <h1 className={styles.name}>{product.name}</h1>
-            {product.freezeLabel ? (
-              <FreezeBadge label={product.freezeLabel} />
+            {product.promoLabel || product.dietLabel || product.freezeLabel ? (
+              <div className={styles.labelList}>
+                {product.promoLabel ? (
+                  <span className={styles.promoBadge}>
+                    {product.promoLabel}
+                  </span>
+                ) : null}
+
+                {product.dietLabel ? (
+                  <span className={styles.dietBadge}>{product.dietLabel}</span>
+                ) : null}
+
+                {product.freezeLabel ? (
+                  <FreezeBadge label={product.freezeLabel} />
+                ) : null}
+              </div>
             ) : null}
           </div>
 
@@ -70,10 +92,20 @@ export const ProductPageClient = ({ product }: ProductPageClientProps) => {
             isOutOfStock={product.isOutOfStock}
           />
 
-          <p className={styles.lead}>
+          {deliveryDates.length ? (
+            <div className={styles.deliveryDates}>
+              {deliveryDates.map((item) => (
+                <span key={item.city} className={styles.deliveryDate}>
+                  {item.city}: {item.date}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {/* <p className={styles.lead}>
             {product.description[0]?.text ??
               "Живой фермерский продукт с понятными характеристиками, который удобно заказать как для повседневного рациона, так и для семейного стола."}
-          </p>
+          </p> */}
 
           <ul id="description" className={styles.descriptionList}>
             {product.description.map((item) => (

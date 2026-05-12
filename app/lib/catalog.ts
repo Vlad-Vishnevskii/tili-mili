@@ -63,6 +63,7 @@ export type StrapiProduct = {
   price: number;
   promoLabel?: string | null;
   freezeLabel?: string | null;
+  dietLabel?: string | null;
   isOutOfStock?: boolean | null;
   unitValue: number;
   unitName: string;
@@ -99,6 +100,7 @@ export type CatalogProduct = {
   price: number;
   promoLabel?: string;
   freezeLabel?: string;
+  dietLabel?: string;
   isOutOfStock: boolean;
   seo: SiteSeo;
   unit: {
@@ -228,6 +230,7 @@ export const normalizeProducts = (products: StrapiProduct[]): CatalogProduct[] =
     price: product.price,
     promoLabel: product.promoLabel ?? undefined,
     freezeLabel: product.freezeLabel ?? undefined,
+    dietLabel: product.dietLabel?.trim() || undefined,
     isOutOfStock: Boolean(product.isOutOfStock),
     seo: normalizeSeo(product.seo),
     unit: {

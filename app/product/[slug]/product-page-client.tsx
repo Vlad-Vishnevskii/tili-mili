@@ -34,8 +34,26 @@ export const ProductPageClient = ({
       <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
         <Link href="/">Главная</Link>
         <span>/</span>
-        <Link href={product.category?.link ?? "/"}>Продукция</Link>
+        <Link href="/">Продукция</Link>
         <span>/</span>
+        {product.category ? (
+          <>
+            <Link href={product.category.link}>{product.category.name}</Link>
+            <span>/</span>
+          </>
+        ) : null}
+        {product.subcategory ? (
+          <>
+            {product.subcategory.link ? (
+              <Link href={product.subcategory.link}>
+                {product.subcategory.name}
+              </Link>
+            ) : (
+              <span>{product.subcategory.name}</span>
+            )}
+            <span>/</span>
+          </>
+        ) : null}
         <span aria-current="page">{product.name}</span>
       </nav>
 

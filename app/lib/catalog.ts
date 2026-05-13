@@ -134,11 +134,13 @@ export type CatalogProduct = {
     id: number;
     name: string;
     slug: string;
+    link: string | null;
   } | null;
   subcategories: Array<{
     id: number;
     name: string;
     slug: string;
+    link: string | null;
   }>;
 };
 
@@ -263,6 +265,7 @@ const normalizeSubcategories = (
 const normalizeProductSubcategories = (
   product: StrapiProduct,
 ): CatalogProduct["subcategories"] => {
+  const categorySlug = product.category?.slug ?? null;
   const subcategories = [
     ...(product.subcategories ?? []),
     ...(product.subcategory ? [product.subcategory] : []),
@@ -284,6 +287,7 @@ const normalizeProductSubcategories = (
         id: item.id,
         name,
         slug,
+        link: categorySlug ? getSubcategoryLink(categorySlug, slug) : null,
       };
     })
     .filter(

@@ -83,7 +83,15 @@ export const CategoryPageClient = ({
         <span>/</span>
         <Link href="/">Продукция</Link>
         <span>/</span>
-        <span aria-current="page">{category.name}</span>
+        {selectedSubcategory ? (
+          <>
+            <Link href={category.link}>{category.name}</Link>
+            <span>/</span>
+            <span aria-current="page">{selectedSubcategory.name}</span>
+          </>
+        ) : (
+          <span aria-current="page">{category.name}</span>
+        )}
       </nav>
 
       <section className={styles.hero}>

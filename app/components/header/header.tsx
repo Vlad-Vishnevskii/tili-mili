@@ -52,7 +52,10 @@ const getCategorySearchResults = (
         [
           category.name,
           category.slug,
-          ...category.subCategories.map((item) => item.label),
+          ...category.subCategories.flatMap((item) => [
+            item.name,
+            item.slug ?? "",
+          ]),
         ].join(" "),
       );
 
@@ -77,6 +80,7 @@ const getProductSearchResults = (
           product.name,
           product.slug,
           product.category?.name ?? "",
+          ...product.subcategories.flatMap((item) => [item.name, item.slug]),
           product.freezeLabel ?? "",
           product.promoLabel ?? "",
           product.dietLabel ?? "",
@@ -425,17 +429,10 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
             })}
           >
             <div ref={desktopNavRef} className={styles.navbarDesktopInner}>
-              {categories.map((item) => (
-                <Dropdown
-                  key={item.id}
-                  menu={{
-                    items: item.subCategories.map((subCategory) => ({
-                      key: subCategory.id.toString(),
-                      label: <Link href="/">{subCategory.label}</Link>,
-                    })),
-                  }}
-                >
+              {categories.map((item) => {
+                const categoryLink = (
                   <Link
+                    key={item.id}
                     className={classnames(styles.navbarItem, {
                       [styles.navbarItemActive]: pathname === item.link,
                     })}
@@ -443,8 +440,33 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
                   >
                     {item.name}
                   </Link>
-                </Dropdown>
-              ))}
+                );
+
+                if (!item.subCategories.length) {
+                  return categoryLink;
+                }
+
+                return (
+                  <Dropdown
+                    key={item.id}
+                    menu={{
+                      items: item.subCategories.map((subCategory) => ({
+                        key:
+                          subCategory.slug ??
+                          subCategory.documentId ??
+                          subCategory.id.toString(),
+                        label: (
+                          <Link href={subCategory.link}>
+                            {subCategory.name}
+                          </Link>
+                        ),
+                      })),
+                    }}
+                  >
+                    {categoryLink}
+                  </Dropdown>
+                );
+              })}
             </div>
           </div>
 

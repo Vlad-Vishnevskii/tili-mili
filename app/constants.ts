@@ -16,6 +16,11 @@ export const STRAPI_SITE_SETTINGS_PATH = "/api/site-setting?populate=*";
 
 export const STRAPI_HOME_PAGE_PATH = "/api/home-page?populate=*";
 
+export const STRAPI_CATEGORIES_PATH =
+  "/api/categories?populate[image]=true&populate[seo]=true&populate[descriptionBlocks]=true&populate[products]=true&populate[subcategories][populate][products]=true&sort=sortOrder:asc";
+
+export const STRAPI_PRODUCTS_PATH = "/api/products?populate=*";
+
 export const API_BASE_URL = removeTrailingSlash(
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
 );

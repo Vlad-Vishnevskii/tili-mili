@@ -5,7 +5,15 @@ import { CategoryPageClient } from "./category-page-client";
 
 type Props = {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<CategorySearchParams>;
 };
+
+type CategorySearchParams = {
+  subcategory?: string | string[];
+};
+
+const getSearchParamValue = (value?: string | string[]) =>
+  Array.isArray(value) ? value[0] : value ?? null;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -25,19 +33,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-const CategoryPage = async ({ params }: Props) => {
+const CategoryPage = async ({ params, searchParams }: Props) => {
   const { slug } = await params;
+  const resolvedSearchParams: CategorySearchParams = searchParams
+    ? await searchParams
+    : {};
   const [categories, products, siteSettings] = await Promise.all([
     getCategories(),
     getProducts(),
     getSiteSettings(),
   ]);
   const category = categories.find((item) => item.slug === slug) ?? null;
+  const selectedSubcategorySlug = getSearchParamValue(
+    resolvedSearchParams.subcategory,
+  );
 
   return (
     <CategoryPageClient
       category={category}
       products={products}
+      selectedSubcategorySlug={selectedSubcategorySlug}
       siteSettings={siteSettings}
     />
   );

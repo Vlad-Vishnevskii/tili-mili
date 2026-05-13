@@ -11,17 +11,45 @@ import styles from "./styles.module.css";
 type CategoryPageClientProps = {
   category: CatalogCategory | null;
   products: CatalogProduct[];
+  selectedSubcategorySlug?: string | null;
   siteSettings: Pick<SiteSettings, "deliveryDateSpb" | "deliveryDateMsk">;
 };
 
 export const CategoryPageClient = ({
   category,
   products,
+  selectedSubcategorySlug,
   siteSettings,
 }: CategoryPageClientProps) => {
-  const categoryProducts = products.filter(
-    (product) => product.category?.id === category?.id,
+  const selectedSubcategory = selectedSubcategorySlug
+    ? category?.subCategories.find((item) => item.slug === selectedSubcategorySlug) ??
+      null
+    : null;
+  const hasProductSubcategoryData = products.some(
+    (product) =>
+      product.category?.id === category?.id && product.subcategories.length > 0,
   );
+  const canFilterBySelectedSubcategory = Boolean(
+    selectedSubcategory &&
+      (selectedSubcategory.productIds.length || hasProductSubcategoryData),
+  );
+  const categoryProducts = products.filter((product) => {
+    if (product.category?.id !== category?.id) {
+      return false;
+    }
+
+    if (!selectedSubcategory || !canFilterBySelectedSubcategory) {
+      return true;
+    }
+
+    if (selectedSubcategory.productIds.length) {
+      return selectedSubcategory.productIds.includes(product.id);
+    }
+
+    return product.subcategories.some(
+      (item) => item.slug === selectedSubcategory.slug,
+    );
+  });
   const availableProducts = categoryProducts.filter(
     (card) => !card.isOutOfStock,
   );
@@ -98,16 +126,23 @@ export const CategoryPageClient = ({
           </div>
 
           <div className={styles.filters}>
-            {category.subCategories.map((item, index) => (
-              <Button
-                key={item.id}
-                className={
-                  index === 0 ? styles.filterActive : styles.filterButton
-                }
-              >
-                {item.label}
-              </Button>
-            ))}
+            {category.subCategories.map((item, index) => {
+              const isActive = selectedSubcategory
+                ? selectedSubcategory.id === item.id
+                : index === 0;
+
+              return (
+                <Button
+                  key={item.id}
+                  href={item.link}
+                  className={
+                    isActive ? styles.filterActive : styles.filterButton
+                  }
+                >
+                  {item.label}
+                </Button>
+              );
+            })}
           </div>
         </section>
       ) : null}

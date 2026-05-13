@@ -1,4 +1,8 @@
-import { STRAPI_URL } from "@/app/constants";
+import {
+  STRAPI_CATEGORIES_PATH,
+  STRAPI_PRODUCTS_PATH,
+  STRAPI_URL,
+} from "@/app/constants";
 import {
   normalizeCategories,
   normalizeProducts,
@@ -26,7 +30,7 @@ const fetchCatalogCollection = async <T>(path: string) => {
 
 export const getCategories = async (): Promise<CatalogCategory[]> => {
   const payload = await fetchCatalogCollection<StrapiCategory>(
-    "/api/categories?populate=*&sort=sortOrder:asc",
+    STRAPI_CATEGORIES_PATH,
   );
 
   return normalizeCategories(payload.data);
@@ -34,7 +38,7 @@ export const getCategories = async (): Promise<CatalogCategory[]> => {
 
 export const getProducts = async (): Promise<CatalogProduct[]> => {
   const payload = await fetchCatalogCollection<StrapiProduct>(
-    "/api/products?populate=*",
+    STRAPI_PRODUCTS_PATH,
   );
 
   return normalizeProducts(payload.data);

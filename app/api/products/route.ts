@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { STRAPI_URL } from "@/app/constants";
+import { STRAPI_PRODUCTS_PATH, STRAPI_URL } from "@/app/constants";
 import {
   normalizeProducts,
   type StrapiCollectionResponse,
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const response = await fetch(`${STRAPI_URL}/api/products?populate=*`, {
+    const response = await fetch(`${STRAPI_URL}${STRAPI_PRODUCTS_PATH}`, {
       cache: "no-store",
       headers: {
         Accept: "application/json",

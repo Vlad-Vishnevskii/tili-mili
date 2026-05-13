@@ -27,11 +27,6 @@ type StrapiDescriptionItem = {
   text: string;
 };
 
-type StrapiSubcategory = {
-  id: number;
-  label: string;
-};
-
 type StrapiCategoryRelation = {
   id: number;
   name: string;
@@ -40,6 +35,16 @@ type StrapiCategoryRelation = {
 
 type StrapiProductSummary = {
   id: number;
+};
+
+type StrapiSubcategory = {
+  id: number;
+  documentId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  slug?: string | null;
+  sortOrder?: number | null;
+  products?: StrapiProductSummary[] | null;
 };
 
 export type StrapiCategory = {
@@ -71,6 +76,8 @@ export type StrapiProduct = {
   seo?: unknown;
   descriptionItems?: StrapiDescriptionItem[] | null;
   category?: StrapiCategoryRelation | null;
+  subcategory?: StrapiCategoryRelation | null;
+  subcategories?: StrapiSubcategory[] | null;
 };
 
 export type CatalogCategory = {
@@ -85,7 +92,13 @@ export type CatalogCategory = {
   seo: SiteSeo;
   subCategories: Array<{
     id: number;
+    documentId: string | null;
+    name: string;
     label: string;
+    slug: string | null;
+    sortOrder: number | null;
+    link: string;
+    productIds: number[];
   }>;
   productIds: number[];
 };
@@ -117,6 +130,16 @@ export type CatalogProduct = {
     slug: string;
     link: string;
   } | null;
+  subcategory: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  subcategories: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
 };
 
 export type StrapiCollectionResponse<T> = {
@@ -180,24 +203,100 @@ const getProductImage = (
   (categorySlug ? CATEGORY_FALLBACK_IMAGES[categorySlug] : null) ??
   DEFAULT_PRODUCT_IMAGE;
 
+export const getSubcategoryLink = (
+  categorySlug: string,
+  subcategorySlug?: string | null,
+) =>
+  subcategorySlug
+    ? `/category/${categorySlug}?subcategory=${encodeURIComponent(subcategorySlug)}`
+    : `/category/${categorySlug}`;
+
+const sortBySortOrderAndName = <T extends { sortOrder?: number | null; name: string }>(
+  left: T,
+  right: T,
+) => {
+  const leftSortOrder =
+    typeof left.sortOrder === "number" ? left.sortOrder : Number.POSITIVE_INFINITY;
+  const rightSortOrder =
+    typeof right.sortOrder === "number"
+      ? right.sortOrder
+      : Number.POSITIVE_INFINITY;
+
+  if (leftSortOrder !== rightSortOrder) {
+    return leftSortOrder - rightSortOrder;
+  }
+
+  return left.name.localeCompare(right.name, "ru");
+};
+
+const normalizeSubcategories = (
+  categorySlug: string,
+  subcategories?: StrapiSubcategory[] | null,
+): CatalogCategory["subCategories"] =>
+  [...(subcategories ?? [])]
+    .map((item) => {
+      const name = (item.name ?? item.label ?? "").trim();
+      const slug = item.slug?.trim() || null;
+
+      if (!name) {
+        return null;
+      }
+
+      return {
+        id: item.id,
+        documentId: item.documentId ?? null,
+        name,
+        label: name,
+        slug,
+        sortOrder:
+          typeof item.sortOrder === "number" ? item.sortOrder : null,
+        link: getSubcategoryLink(categorySlug, slug),
+        productIds: item.products?.map((product) => product.id) ?? [],
+      };
+    })
+    .filter(
+      (item): item is CatalogCategory["subCategories"][number] =>
+        item !== null,
+    )
+    .sort(sortBySortOrderAndName);
+
+const normalizeProductSubcategories = (
+  product: StrapiProduct,
+): CatalogProduct["subcategories"] => {
+  const subcategories = [
+    ...(product.subcategories ?? []),
+    ...(product.subcategory ? [product.subcategory] : []),
+  ];
+  const seenSlugs = new Set<string>();
+
+  return subcategories
+    .map((item) => {
+      const name = item.name?.trim() ?? "";
+      const slug = item.slug?.trim() ?? "";
+
+      if (!name || !slug || seenSlugs.has(slug)) {
+        return null;
+      }
+
+      seenSlugs.add(slug);
+
+      return {
+        id: item.id,
+        name,
+        slug,
+      };
+    })
+    .filter(
+      (item): item is CatalogProduct["subcategories"][number] =>
+        item !== null,
+    );
+};
+
 export const normalizeCategories = (
   categories: StrapiCategory[],
 ): CatalogCategory[] =>
   [...categories]
-    .sort((left, right) => {
-      const leftSortOrder =
-        typeof left.sortOrder === "number" ? left.sortOrder : Number.POSITIVE_INFINITY;
-      const rightSortOrder =
-        typeof right.sortOrder === "number"
-          ? right.sortOrder
-          : Number.POSITIVE_INFINITY;
-
-      if (leftSortOrder !== rightSortOrder) {
-        return leftSortOrder - rightSortOrder;
-      }
-
-      return left.name.localeCompare(right.name, "ru");
-    })
+    .sort(sortBySortOrderAndName)
     .map((category) => ({
       id: category.id,
       documentId: category.documentId,
@@ -211,43 +310,48 @@ export const normalizeCategories = (
       categoryDescription:
         category.descriptionBlocks?.map((block) => block.text).filter(Boolean) ??
         [],
-      subCategories:
-        category.subcategories?.map((item) => ({
-          id: item.id,
-          label: item.label,
-        })) ?? [],
+      subCategories: normalizeSubcategories(
+        category.slug,
+        category.subcategories,
+      ),
       productIds: category.products?.map((product) => product.id) ?? [],
     }));
 
 export const normalizeProducts = (products: StrapiProduct[]): CatalogProduct[] =>
-  products.map((product) => ({
-    id: product.id,
-    documentId: product.documentId,
-    name: product.name,
-    slug: product.slug,
-    img: getProductImage(product.slug, product.category?.slug, product.image),
-    link: `/product/${product.slug}`,
-    price: product.price,
-    promoLabel: product.promoLabel ?? undefined,
-    freezeLabel: product.freezeLabel ?? undefined,
-    dietLabel: product.dietLabel?.trim() || undefined,
-    isOutOfStock: Boolean(product.isOutOfStock),
-    seo: normalizeSeo(product.seo),
-    unit: {
-      value: product.unitValue,
-      name: product.unitName,
-    },
-    description:
-      product.descriptionItems?.map((item) => ({
-        name: item.name,
-        text: item.text,
-      })) ?? [],
-    category: product.category
-      ? {
-          id: product.category.id,
-          name: product.category.name,
-          slug: product.category.slug,
-          link: `/category/${product.category.slug}`,
-        }
-      : null,
-  }));
+  products.map((product) => {
+    const subcategories = normalizeProductSubcategories(product);
+
+    return {
+      id: product.id,
+      documentId: product.documentId,
+      name: product.name,
+      slug: product.slug,
+      img: getProductImage(product.slug, product.category?.slug, product.image),
+      link: `/product/${product.slug}`,
+      price: product.price,
+      promoLabel: product.promoLabel ?? undefined,
+      freezeLabel: product.freezeLabel ?? undefined,
+      dietLabel: product.dietLabel?.trim() || undefined,
+      isOutOfStock: Boolean(product.isOutOfStock),
+      seo: normalizeSeo(product.seo),
+      unit: {
+        value: product.unitValue,
+        name: product.unitName,
+      },
+      description:
+        product.descriptionItems?.map((item) => ({
+          name: item.name,
+          text: item.text,
+        })) ?? [],
+      category: product.category
+        ? {
+            id: product.category.id,
+            name: product.category.name,
+            slug: product.category.slug,
+            link: `/category/${product.category.slug}`,
+          }
+        : null,
+      subcategory: subcategories[0] ?? null,
+      subcategories,
+    };
+  });

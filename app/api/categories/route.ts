@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { STRAPI_URL } from "@/app/constants";
+import { STRAPI_CATEGORIES_PATH, STRAPI_URL } from "@/app/constants";
 import {
   normalizeCategories,
   type StrapiCategory,
@@ -10,15 +10,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/categories?populate=*&sort=sortOrder:asc`,
-      {
+    const response = await fetch(`${STRAPI_URL}${STRAPI_CATEGORIES_PATH}`, {
       cache: "no-store",
       headers: {
         Accept: "application/json",
       },
-      },
-    );
+    });
 
     if (!response.ok) {
       return NextResponse.json(

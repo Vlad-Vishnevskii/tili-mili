@@ -25,6 +25,13 @@ export const API_BASE_URL = removeTrailingSlash(
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
 );
 
+export const APP_ICON_PATH = "/app-icon";
+
+export const getAppIconPath = (size: 180 | 192 | 512) =>
+  `${APP_ICON_PATH}?size=${size}`;
+
+export const MANIFEST_PATH = "/manifest.webmanifest";
+
 export const QUERY_STALE_TIME = 1000 * 60 * 5;
 
 export const HERO_SLIDES = [

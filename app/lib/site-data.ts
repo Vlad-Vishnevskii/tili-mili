@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import {
+  getAppIconPath,
+  MANIFEST_PATH,
   SITE_URL,
   STRAPI_HOME_PAGE_PATH,
   STRAPI_SITE_SETTINGS_PATH,
@@ -39,6 +41,7 @@ export type SiteSettings = {
   siteName: string;
   siteDescription: string;
   faviconUrl: string | null;
+  appIconUrl: string | null;
   defaultSeo: SiteSeo;
   contacts: SiteContacts | null;
   socialLinks: SiteSocialLink[];
@@ -364,6 +367,7 @@ const getFallbackSiteSettings = (): SiteSettings => ({
   siteName: DEFAULT_SITE_NAME,
   siteDescription: DEFAULT_SITE_DESCRIPTION,
   faviconUrl: DEFAULT_FAVICON,
+  appIconUrl: DEFAULT_FAVICON,
   defaultSeo: {
     title: DEFAULT_SITE_NAME,
     description: DEFAULT_SITE_DESCRIPTION,
@@ -405,12 +409,19 @@ export const getSiteSettings = async (): Promise<SiteSettings> => {
     }
 
     const fallback = getFallbackSiteSettings();
+    const faviconUrl = extractMediaUrl(payload.favicon) ?? fallback.faviconUrl;
 
     return {
       siteName: getString(payload.siteName) ?? fallback.siteName,
       siteDescription:
         getString(payload.siteDescription) ?? fallback.siteDescription,
-      faviconUrl: extractMediaUrl(payload.favicon) ?? fallback.faviconUrl,
+      faviconUrl,
+      appIconUrl:
+        extractMediaUrl(payload.appIcon) ??
+        extractMediaUrl(payload.pwaIcon) ??
+        extractMediaUrl(payload.homeScreenIcon) ??
+        extractMediaUrl(payload.appleTouchIcon) ??
+        faviconUrl,
       defaultSeo: normalizeSeo(payload.defaultSeo),
       contacts: normalizeContacts(payload.contacts),
       socialLinks: normalizeSocialLinks(payload.socialLinks),
@@ -512,9 +523,11 @@ export const buildMetadata = ({
 
   return {
     metadataBase: SITE_URL ? new URL(SITE_URL) : undefined,
+    applicationName: siteName ?? DEFAULT_SITE_NAME,
     title,
     description,
     keywords: mergedSeo.keywords,
+    manifest: MANIFEST_PATH,
     alternates: canonicalUrl
       ? {
           canonical: canonicalUrl,
@@ -543,10 +556,21 @@ export const buildMetadata = ({
             follow: !mergedSeo.noFollow,
           }
         : undefined,
+    appleWebApp: {
+      capable: true,
+      title: siteName ?? title,
+      statusBarStyle: "default",
+    },
     icons: {
       icon: iconUrl,
       shortcut: iconUrl,
-      apple: iconUrl,
+      apple: [
+        {
+          url: getAppIconPath(180),
+          sizes: "180x180",
+          type: "image/png",
+        },
+      ],
     },
   };
 };

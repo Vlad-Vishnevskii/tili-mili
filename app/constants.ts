@@ -1,6 +1,6 @@
 const removeTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
-const DEFAULT_STRAPI_URL = "http://72.56.6.211:1337";
+const DEFAULT_STRAPI_URL = "https://api.tili-mili.ru";
 
 export const STRAPI_URL = removeTrailingSlash(
   process.env.STRAPI_URL ??

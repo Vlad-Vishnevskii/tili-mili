@@ -1,6 +1,7 @@
 const removeTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 const DEFAULT_STRAPI_URL = "https://api.tili-mili.ru";
+const DEFAULT_SITE_URL = "https://tili-mili.ru";
 
 export const STRAPI_URL = removeTrailingSlash(
   process.env.STRAPI_URL ??
@@ -9,7 +10,7 @@ export const STRAPI_URL = removeTrailingSlash(
 );
 
 export const SITE_URL = removeTrailingSlash(
-  process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "",
+  process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL,
 );
 
 export const STRAPI_SITE_SETTINGS_PATH = "/api/site-setting?populate=*";

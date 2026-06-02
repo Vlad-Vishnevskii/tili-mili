@@ -213,29 +213,11 @@ export const getSubcategoryLink = (
     ? `/category/${categorySlug}?subcategory=${encodeURIComponent(subcategorySlug)}`
     : `/category/${categorySlug}`;
 
-const sortBySortOrderAndName = <T extends { sortOrder?: number | null; name: string }>(
-  left: T,
-  right: T,
-) => {
-  const leftSortOrder =
-    typeof left.sortOrder === "number" ? left.sortOrder : Number.POSITIVE_INFINITY;
-  const rightSortOrder =
-    typeof right.sortOrder === "number"
-      ? right.sortOrder
-      : Number.POSITIVE_INFINITY;
-
-  if (leftSortOrder !== rightSortOrder) {
-    return leftSortOrder - rightSortOrder;
-  }
-
-  return left.name.localeCompare(right.name, "ru");
-};
-
 const normalizeSubcategories = (
   categorySlug: string,
   subcategories?: StrapiSubcategory[] | null,
 ): CatalogCategory["subCategories"] =>
-  [...(subcategories ?? [])]
+  (subcategories ?? [])
     .map((item) => {
       const name = (item.name ?? item.label ?? "").trim();
       const slug = item.slug?.trim() || null;
@@ -259,8 +241,7 @@ const normalizeSubcategories = (
     .filter(
       (item): item is CatalogCategory["subCategories"][number] =>
         item !== null,
-    )
-    .sort(sortBySortOrderAndName);
+    );
 
 const normalizeProductSubcategories = (
   product: StrapiProduct,
@@ -299,27 +280,25 @@ const normalizeProductSubcategories = (
 export const normalizeCategories = (
   categories: StrapiCategory[],
 ): CatalogCategory[] =>
-  [...categories]
-    .sort(sortBySortOrderAndName)
-    .map((category) => ({
-      id: category.id,
-      documentId: category.documentId,
-      name: category.name,
-      slug: category.slug,
-      sortOrder:
-        typeof category.sortOrder === "number" ? category.sortOrder : null,
-      link: `/category/${category.slug}`,
-      img: getCategoryImage(category.slug, category.image),
-      seo: normalizeSeo(category.seo),
-      categoryDescription:
-        category.descriptionBlocks?.map((block) => block.text).filter(Boolean) ??
-        [],
-      subCategories: normalizeSubcategories(
-        category.slug,
-        category.subcategories,
-      ),
-      productIds: category.products?.map((product) => product.id) ?? [],
-    }));
+  categories.map((category) => ({
+    id: category.id,
+    documentId: category.documentId,
+    name: category.name,
+    slug: category.slug,
+    sortOrder:
+      typeof category.sortOrder === "number" ? category.sortOrder : null,
+    link: `/category/${category.slug}`,
+    img: getCategoryImage(category.slug, category.image),
+    seo: normalizeSeo(category.seo),
+    categoryDescription:
+      category.descriptionBlocks?.map((block) => block.text).filter(Boolean) ??
+      [],
+    subCategories: normalizeSubcategories(
+      category.slug,
+      category.subcategories,
+    ),
+    productIds: category.products?.map((product) => product.id) ?? [],
+  }));
 
 export const normalizeProducts = (products: StrapiProduct[]): CatalogProduct[] =>
   products.map((product) => {

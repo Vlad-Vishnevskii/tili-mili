@@ -15,6 +15,38 @@ type CategoryPageClientProps = {
   siteSettings: Pick<SiteSettings, "deliveryDateSpb" | "deliveryDateMsk">;
 };
 
+const sortProductsByRelationOrder = (
+  products: CatalogProduct[],
+  productIds: number[],
+) => {
+  if (!productIds.length) {
+    return products;
+  }
+
+  const productOrder = new Map(
+    productIds.map((productId, index) => [productId, index]),
+  );
+
+  return [...products].sort((left, right) => {
+    const leftOrder = productOrder.get(left.id);
+    const rightOrder = productOrder.get(right.id);
+
+    if (leftOrder !== undefined && rightOrder !== undefined) {
+      return leftOrder - rightOrder;
+    }
+
+    if (leftOrder !== undefined) {
+      return -1;
+    }
+
+    if (rightOrder !== undefined) {
+      return 1;
+    }
+
+    return 0;
+  });
+};
+
 export const CategoryPageClient = ({
   category,
   products,
@@ -25,31 +57,34 @@ export const CategoryPageClient = ({
     ? category?.subCategories.find((item) => item.slug === selectedSubcategorySlug) ??
       null
     : null;
-  const hasProductSubcategoryData = products.some(
-    (product) =>
-      product.category?.id === category?.id && product.subcategories.length > 0,
+  const relationProductIds =
+    selectedSubcategory?.productIds.length
+      ? selectedSubcategory.productIds
+      : category?.productIds ?? [];
+  const categoryProducts = sortProductsByRelationOrder(
+    products.filter((product) => {
+      if (selectedSubcategory?.productIds.length) {
+        return selectedSubcategory.productIds.includes(product.id);
+      }
+
+      if (selectedSubcategory) {
+        if (product.category?.id !== category?.id) {
+          return false;
+        }
+
+        return product.subcategories.some(
+          (item) => item.slug === selectedSubcategory.slug,
+        );
+      }
+
+      if (category?.productIds.length) {
+        return category.productIds.includes(product.id);
+      }
+
+      return product.category?.id === category?.id;
+    }),
+    relationProductIds,
   );
-  const canFilterBySelectedSubcategory = Boolean(
-    selectedSubcategory &&
-      (selectedSubcategory.productIds.length || hasProductSubcategoryData),
-  );
-  const categoryProducts = products.filter((product) => {
-    if (product.category?.id !== category?.id) {
-      return false;
-    }
-
-    if (!selectedSubcategory || !canFilterBySelectedSubcategory) {
-      return true;
-    }
-
-    if (selectedSubcategory.productIds.length) {
-      return selectedSubcategory.productIds.includes(product.id);
-    }
-
-    return product.subcategories.some(
-      (item) => item.slug === selectedSubcategory.slug,
-    );
-  });
   const availableProducts = categoryProducts.filter(
     (card) => !card.isOutOfStock,
   );

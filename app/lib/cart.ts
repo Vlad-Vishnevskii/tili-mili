@@ -10,7 +10,11 @@ export type OrderRequestPayload = {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  deliveryRegion: string;
+  deliveryRegionCode: "msk" | "spb";
   deliveryAddress: string;
+  deliveryDate: string;
+  deliveryTimeInterval: string;
   comment: string;
   items: Array<{
     productId: number;

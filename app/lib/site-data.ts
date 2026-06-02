@@ -37,6 +37,16 @@ export type SiteSocialLink = {
   href: string;
 };
 
+export type SiteDeliveryDateRange = {
+  dateFrom: string;
+  dateTo: string;
+};
+
+export type SiteDeliveryTimeInterval = {
+  timeFrom: string;
+  timeTo: string;
+};
+
 export type SiteSettings = {
   siteName: string;
   siteDescription: string;
@@ -46,8 +56,10 @@ export type SiteSettings = {
   contacts: SiteContacts | null;
   socialLinks: SiteSocialLink[];
   promoText?: string;
-  deliveryDateSpb: string | null;
-  deliveryDateMsk: string | null;
+  deliveryDateSpb: SiteDeliveryDateRange | null;
+  deliveryDateMsk: SiteDeliveryDateRange | null;
+  deliveryTimeIntervalsSpb: SiteDeliveryTimeInterval[];
+  deliveryTimeIntervalsMsk: SiteDeliveryTimeInterval[];
 };
 
 export type HomeHeroBanner = {
@@ -321,6 +333,50 @@ const normalizeSocialLinks = (value: unknown): SiteSocialLink[] => {
     .filter((item): item is SiteSocialLink => item !== null);
 };
 
+const normalizeDeliveryDateRange = (
+  value: unknown,
+): SiteDeliveryDateRange | null => {
+  const entry = extractSingleType(value) ?? unwrapEntry(value);
+
+  if (!entry) {
+    return null;
+  }
+
+  const dateFrom = getString(entry.dateFrom);
+  const dateTo = getString(entry.dateTo);
+
+  return dateFrom && dateTo ? { dateFrom, dateTo } : null;
+};
+
+const normalizeDeliveryTimeIntervals = (
+  value: unknown,
+): SiteDeliveryTimeInterval[] => {
+  const entries = Array.isArray(value)
+    ? value
+    : isRecord(value) && Array.isArray(value.data)
+      ? value.data
+      : [];
+
+  if (!entries.length) {
+    return [];
+  }
+
+  return entries
+    .map((item) => {
+      const entry = unwrapEntry(item);
+
+      if (!entry) {
+        return null;
+      }
+
+      const timeFrom = getString(entry.timeFrom);
+      const timeTo = getString(entry.timeTo);
+
+      return timeFrom && timeTo ? { timeFrom, timeTo } : null;
+    })
+    .filter((item): item is SiteDeliveryTimeInterval => item !== null);
+};
+
 const normalizeHeroBanners = (value: unknown): HomeHeroBanner[] => {
   if (!Array.isArray(value)) {
     return [];
@@ -376,6 +432,8 @@ const getFallbackSiteSettings = (): SiteSettings => ({
   socialLinks: [],
   deliveryDateSpb: null,
   deliveryDateMsk: null,
+  deliveryTimeIntervalsSpb: [],
+  deliveryTimeIntervalsMsk: [],
 });
 
 const getFallbackHomePage = (): HomePageData => ({
@@ -426,8 +484,14 @@ export const getSiteSettings = async (): Promise<SiteSettings> => {
       contacts: normalizeContacts(payload.contacts),
       socialLinks: normalizeSocialLinks(payload.socialLinks),
       promoText: getString(payload.promoText),
-      deliveryDateSpb: getString(payload.deliveryDateSpb) ?? null,
-      deliveryDateMsk: getString(payload.deliveryDateMsk) ?? null,
+      deliveryDateSpb: normalizeDeliveryDateRange(payload.deliveryDateSpb),
+      deliveryDateMsk: normalizeDeliveryDateRange(payload.deliveryDateMsk),
+      deliveryTimeIntervalsSpb: normalizeDeliveryTimeIntervals(
+        payload.deliveryTimeIntervalsSpb,
+      ),
+      deliveryTimeIntervalsMsk: normalizeDeliveryTimeIntervals(
+        payload.deliveryTimeIntervalsMsk,
+      ),
     };
   } catch {
     return getFallbackSiteSettings();

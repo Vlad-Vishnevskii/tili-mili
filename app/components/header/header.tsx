@@ -513,6 +513,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
         onRemoveItem={removeCartItem}
         onSubmitSuccess={clearCart}
         onUpdateQuantity={updateCartItemQuantity}
+        siteSettings={siteSettings}
         totalItems={totalItems}
         totalPrice={totalPrice}
         totalWeight={totalWeight}

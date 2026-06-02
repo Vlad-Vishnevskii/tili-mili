@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
-import { Button, Input } from "antd";
+import { Button, Input, Segmented, Select } from "antd";
 import {
   ArrowLeftOutlined,
   CloseOutlined,
@@ -14,7 +14,13 @@ import {
   PlusOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
+import {
+  getDeliveryDateOptions,
+  getDeliveryTimeIntervalOptions,
+  type DeliveryRegion,
+} from "@/app/lib/delivery-dates";
 import { createOrderRequest } from "@/app/lib/order-requests";
+import type { SiteSettings } from "@/app/lib/site-data";
 import styles from "./cart-modal.module.css";
 
 const CART_MODAL_DISCLAIMER =
@@ -51,10 +57,32 @@ type CartModalProps = {
   totalItems: number;
   totalPrice: number;
   totalWeight: number;
+  siteSettings: Pick<
+    SiteSettings,
+    | "deliveryDateSpb"
+    | "deliveryDateMsk"
+    | "deliveryTimeIntervalsSpb"
+    | "deliveryTimeIntervalsMsk"
+  >;
 };
 
 type CartModalView = "cart" | "checkout";
-type CheckoutField = "name" | "email" | "phone" | "address" | "comment";
+type CheckoutField =
+  | "name"
+  | "email"
+  | "phone"
+  | "deliveryDate"
+  | "deliveryTimeInterval"
+  | "address"
+  | "comment";
+
+const DELIVERY_REGION_OPTIONS: Array<{
+  label: string;
+  value: DeliveryRegion;
+}> = [
+  { label: "Москва", value: "msk" },
+  { label: "Санкт-Петербург", value: "spb" },
+];
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
@@ -93,6 +121,9 @@ const formatPhone = (value: string) => {
   return result;
 };
 
+const getSelectPopupContainer = (triggerNode: HTMLElement) =>
+  triggerNode.parentElement ?? document.body;
+
 export const CartModal = ({
   amountLeftForFreeDelivery,
   cartProducts,
@@ -105,12 +136,16 @@ export const CartModal = ({
   totalItems,
   totalPrice,
   totalWeight,
+  siteSettings,
 }: CartModalProps) => {
   const [view, setView] = useState<CartModalView>("cart");
   const [checkoutForm, setCheckoutForm] = useState({
     name: "",
     email: "",
     phone: "",
+    deliveryRegion: "msk" as DeliveryRegion,
+    deliveryDate: "",
+    deliveryTimeInterval: "",
     address: "",
     comment: "",
   });
@@ -120,6 +155,8 @@ export const CartModal = ({
     name: false,
     email: false,
     phone: false,
+    deliveryDate: false,
+    deliveryTimeInterval: false,
     address: false,
     comment: false,
   });
@@ -127,10 +164,52 @@ export const CartModal = ({
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const deliveryOptionsByRegion = useMemo(
+    () => ({
+      msk: {
+        dates: getDeliveryDateOptions(siteSettings.deliveryDateMsk),
+        timeIntervals: getDeliveryTimeIntervalOptions(
+          siteSettings.deliveryTimeIntervalsMsk,
+        ),
+      },
+      spb: {
+        dates: getDeliveryDateOptions(siteSettings.deliveryDateSpb),
+        timeIntervals: getDeliveryTimeIntervalOptions(
+          siteSettings.deliveryTimeIntervalsSpb,
+        ),
+      },
+    }),
+    [
+      siteSettings.deliveryDateMsk,
+      siteSettings.deliveryDateSpb,
+      siteSettings.deliveryTimeIntervalsMsk,
+      siteSettings.deliveryTimeIntervalsSpb,
+    ],
+  );
+  const selectedDeliveryOptions =
+    deliveryOptionsByRegion[checkoutForm.deliveryRegion];
+  const hasDeliveryDateOptions = selectedDeliveryOptions.dates.length > 0;
+  const hasDeliveryTimeIntervalOptions =
+    selectedDeliveryOptions.timeIntervals.length > 0;
+  const selectedDeliveryRegionLabel =
+    DELIVERY_REGION_OPTIONS.find(
+      (item) => item.value === checkoutForm.deliveryRegion,
+    )?.label ?? checkoutForm.deliveryRegion;
+  const selectedDeliveryDateLabel =
+    selectedDeliveryOptions.dates.find(
+      (item) => item.value === checkoutForm.deliveryDate,
+    )?.label ?? checkoutForm.deliveryDate;
+  const selectedDeliveryTimeIntervalLabel =
+    selectedDeliveryOptions.timeIntervals.find(
+      (item) => item.value === checkoutForm.deliveryTimeInterval,
+    )?.label ?? checkoutForm.deliveryTimeInterval;
+
   const trimmedForm = {
     name: checkoutForm.name.trim(),
     email: checkoutForm.email.trim(),
     phone: checkoutForm.phone.trim(),
+    deliveryDate: checkoutForm.deliveryDate.trim(),
+    deliveryTimeInterval: checkoutForm.deliveryTimeInterval.trim(),
     address: checkoutForm.address.trim(),
     comment: checkoutForm.comment.trim(),
   };
@@ -144,6 +223,14 @@ export const CartModal = ({
         : "Введите корректный email"
       : "Укажите email",
     phone: phoneDigitsCount >= 11 ? "" : "Введите телефон полностью",
+    deliveryDate:
+      !hasDeliveryDateOptions || trimmedForm.deliveryDate
+        ? ""
+        : "Выберите дату доставки",
+    deliveryTimeInterval:
+      !hasDeliveryTimeIntervalOptions || trimmedForm.deliveryTimeInterval
+        ? ""
+        : "Выберите интервал доставки",
     address: trimmedForm.address ? "" : "Укажите адрес доставки",
     comment: "",
   };
@@ -162,6 +249,22 @@ export const CartModal = ({
     setCheckoutForm((current) => ({
       ...current,
       [field]: field === "phone" ? formatPhone(value) : value,
+    }));
+  };
+
+  const updateDeliveryRegion = (deliveryRegion: DeliveryRegion) => {
+    const options = deliveryOptionsByRegion[deliveryRegion];
+
+    setCheckoutForm((current) => ({
+      ...current,
+      deliveryRegion,
+      deliveryDate: options.dates[0]?.value ?? "",
+      deliveryTimeInterval: options.timeIntervals[0]?.value ?? "",
+    }));
+    setTouchedFields((current) => ({
+      ...current,
+      deliveryDate: false,
+      deliveryTimeInterval: false,
     }));
   };
 
@@ -216,11 +319,49 @@ export const CartModal = ({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    setCheckoutForm((current) => {
+      const options = deliveryOptionsByRegion[current.deliveryRegion];
+      const deliveryDate =
+        options.dates.length &&
+        !options.dates.some((item) => item.value === current.deliveryDate)
+          ? options.dates[0].value
+          : options.dates.length
+            ? current.deliveryDate
+            : "";
+      const deliveryTimeInterval =
+        options.timeIntervals.length &&
+        !options.timeIntervals.some(
+          (item) => item.value === current.deliveryTimeInterval,
+        )
+          ? options.timeIntervals[0].value
+          : options.timeIntervals.length
+            ? current.deliveryTimeInterval
+            : "";
+
+      if (
+        deliveryDate === current.deliveryDate &&
+        deliveryTimeInterval === current.deliveryTimeInterval
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        deliveryDate,
+        deliveryTimeInterval,
+      };
+    });
+  }, [checkoutForm.deliveryRegion, deliveryOptionsByRegion]);
+
   const resetCheckoutForm = () => {
     setCheckoutForm({
       name: "",
       email: "",
       phone: "",
+      deliveryRegion: "msk",
+      deliveryDate: "",
+      deliveryTimeInterval: "",
       address: "",
       comment: "",
     });
@@ -228,6 +369,8 @@ export const CartModal = ({
       name: false,
       email: false,
       phone: false,
+      deliveryDate: false,
+      deliveryTimeInterval: false,
       address: false,
       comment: false,
     });
@@ -239,6 +382,8 @@ export const CartModal = ({
         name: true,
         email: true,
         phone: true,
+        deliveryDate: true,
+        deliveryTimeInterval: true,
         address: true,
         comment: true,
       });
@@ -254,7 +399,11 @@ export const CartModal = ({
         customerName: trimmedForm.name,
         customerEmail: trimmedForm.email,
         customerPhone: trimmedForm.phone,
+        deliveryRegion: selectedDeliveryRegionLabel,
+        deliveryRegionCode: checkoutForm.deliveryRegion,
         deliveryAddress: trimmedForm.address,
+        deliveryDate: selectedDeliveryDateLabel,
+        deliveryTimeInterval: selectedDeliveryTimeIntervalLabel,
         comment: trimmedForm.comment,
         items: cartProducts.map((item) => ({
           productId: item.product.id,
@@ -462,7 +611,9 @@ export const CartModal = ({
                       <Input
                         value={checkoutForm.email}
                         status={
-                          touchedFields.email && fieldErrors.email ? "error" : ""
+                          touchedFields.email && fieldErrors.email
+                            ? "error"
+                            : ""
                         }
                         onBlur={() => touchField("email")}
                         onChange={(event) =>
@@ -498,6 +649,75 @@ export const CartModal = ({
                         </span>
                       ) : null}
                     </label>
+
+                    <label className={styles.formFieldFull}>
+                      <span>Регион доставки</span>
+                      <Segmented
+                        block
+                        className={styles.regionSegmented}
+                        options={DELIVERY_REGION_OPTIONS}
+                        value={checkoutForm.deliveryRegion}
+                        onChange={(value) =>
+                          updateDeliveryRegion(value as DeliveryRegion)
+                        }
+                      />
+                    </label>
+
+                    {hasDeliveryDateOptions ? (
+                      <label className={styles.formField}>
+                        <span>Дата доставки</span>
+                        <Select
+                          value={checkoutForm.deliveryDate || undefined}
+                          options={selectedDeliveryOptions.dates}
+                          getPopupContainer={getSelectPopupContainer}
+                          status={
+                            touchedFields.deliveryDate &&
+                            fieldErrors.deliveryDate
+                              ? "error"
+                              : ""
+                          }
+                          onBlur={() => touchField("deliveryDate")}
+                          onChange={(value) =>
+                            updateFieldValue("deliveryDate", value)
+                          }
+                          size="large"
+                        />
+                        {touchedFields.deliveryDate &&
+                        fieldErrors.deliveryDate ? (
+                          <span className={styles.fieldError}>
+                            {fieldErrors.deliveryDate}
+                          </span>
+                        ) : null}
+                      </label>
+                    ) : null}
+
+                    {hasDeliveryTimeIntervalOptions ? (
+                      <label className={styles.formField}>
+                        <span>Интервал доставки</span>
+                        <Select
+                          value={checkoutForm.deliveryTimeInterval || undefined}
+                          options={selectedDeliveryOptions.timeIntervals}
+                          getPopupContainer={getSelectPopupContainer}
+                          status={
+                            touchedFields.deliveryTimeInterval &&
+                            fieldErrors.deliveryTimeInterval
+                              ? "error"
+                              : ""
+                          }
+                          onBlur={() => touchField("deliveryTimeInterval")}
+                          onChange={(value) =>
+                            updateFieldValue("deliveryTimeInterval", value)
+                          }
+                          size="large"
+                        />
+                        {touchedFields.deliveryTimeInterval &&
+                        fieldErrors.deliveryTimeInterval ? (
+                          <span className={styles.fieldError}>
+                            {fieldErrors.deliveryTimeInterval}
+                          </span>
+                        ) : null}
+                      </label>
+                    ) : null}
 
                     <label className={styles.formFieldFull}>
                       <span>Адрес доставки</span>

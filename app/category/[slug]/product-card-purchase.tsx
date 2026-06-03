@@ -3,6 +3,10 @@
 import { Button } from "antd";
 import Link from "next/link";
 import { useState } from "react";
+import {
+  calculateItemTotal,
+  isWeightPricedUnit,
+} from "@/app/lib/pricing";
 import { useCart } from "@/app/providers/cart-provider";
 import styles from "./styles.module.css";
 
@@ -37,8 +41,17 @@ export const ProductCardPurchase = ({
   const cartItem = cartItems.find((item) => item.productId === productId);
 
   const portionCount = cartItem?.quantity ?? draftPortionCount;
+  const isWeightPriced = isWeightPricedUnit(unitName);
   const totalWeight = packageWeight * portionCount;
-  const totalPrice = unitPrice * portionCount;
+  const totalPrice = calculateItemTotal({
+    packageWeight,
+    quantity: portionCount,
+    unitName,
+    unitPrice,
+  });
+  const priceDetails = isWeightPriced
+    ? `${formatPrice(unitPrice)} ₽/кг · ${formatPrice(totalPrice)} ₽`
+    : `${formatPrice(totalPrice)} ₽`;
   const isAddedToCart = Boolean(cartItem);
 
   const handlePortionCountChange = (nextPortionCount: number) => {
@@ -77,7 +90,7 @@ export const ProductCardPurchase = ({
             {formatWeight(totalWeight)} {unitName}
           </strong>
           <span className={styles.cardPurchasePrice}>
-            {formatPrice(totalPrice)} ₽
+            {priceDetails}
           </span>
         </div>
 

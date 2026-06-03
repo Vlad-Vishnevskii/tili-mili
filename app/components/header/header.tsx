@@ -16,6 +16,7 @@ import styles from "./styles.module.css";
 import { FREE_DELIVERY_THRESHOLD, HEADER_IMG_PATHS } from "./constants";
 import { CartModal } from "./cart-modal";
 import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
+import { calculateItemTotal } from "@/app/lib/pricing";
 import type { SiteSettings } from "@/app/lib/site-data";
 import { useCart } from "@/app/providers/cart-provider";
 
@@ -139,7 +140,12 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
 
       const unitPrice = Number(product.price);
       const itemWeight = item.packageWeight * item.quantity;
-      const itemTotal = unitPrice * item.quantity;
+      const itemTotal = calculateItemTotal({
+        packageWeight: item.packageWeight,
+        quantity: item.quantity,
+        unitName: product.unit.name,
+        unitPrice,
+      });
 
       return {
         ...item,

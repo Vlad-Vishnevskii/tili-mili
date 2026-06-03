@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FreezeBadge } from "@/app/components/freeze-badge/freeze-badge";
 import type { CatalogCategory, CatalogProduct } from "@/app/lib/catalog";
 import { getDeliveryDateItems } from "@/app/lib/delivery-dates";
+import { calculateItemTotal } from "@/app/lib/pricing";
 import type { SiteSettings } from "@/app/lib/site-data";
 import { ProductCardPurchase } from "./product-card-purchase";
 import styles from "./styles.module.css";
@@ -47,6 +48,11 @@ const sortProductsByRelationOrder = (
   });
 };
 
+const formatPrice = (value: number) =>
+  new Intl.NumberFormat("ru-RU", {
+    maximumFractionDigits: 0,
+  }).format(Math.round(value));
+
 export const CategoryPageClient = ({
   category,
   products,
@@ -89,7 +95,16 @@ export const CategoryPageClient = ({
     (card) => !card.isOutOfStock,
   );
   const minPrice = categoryProducts.length
-    ? Math.min(...categoryProducts.map((product) => product.price))
+    ? Math.min(
+        ...categoryProducts.map((product) =>
+          calculateItemTotal({
+            packageWeight: product.unit.value,
+            quantity: 1,
+            unitName: product.unit.name,
+            unitPrice: product.price,
+          }),
+        ),
+      )
     : null;
   const deliveryDates = getDeliveryDateItems(siteSettings);
 
@@ -145,7 +160,7 @@ export const CategoryPageClient = ({
               <span>позиций в наличии</span>
             </div>
             <div className={styles.factCard}>
-              <strong>{minPrice ? `от ${minPrice} ₽` : "по запросу"}</strong>
+              <strong>{minPrice ? `от ${formatPrice(minPrice)} ₽` : "по запросу"}</strong>
               <span>стартовая цена</span>
             </div>
           </div>

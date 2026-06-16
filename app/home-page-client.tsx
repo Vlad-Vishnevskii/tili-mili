@@ -13,6 +13,12 @@ type HomePageClientProps = {
   homePage: HomePageData;
 };
 
+type HeroButtonViewModel = {
+  id: string;
+  text: string;
+  link: string;
+};
+
 type HeroSlideViewModel = {
   id: string;
   title: string;
@@ -21,6 +27,7 @@ type HeroSlideViewModel = {
   meta: string[];
   imageUrl?: string;
   mobileImageUrl?: string;
+  buttons: HeroButtonViewModel[];
 };
 
 const fallbackSlides: HeroSlideViewModel[] = HERO_SLIDES.map((slide, index) => ({
@@ -29,7 +36,12 @@ const fallbackSlides: HeroSlideViewModel[] = HERO_SLIDES.map((slide, index) => (
   text: slide.text,
   accent: slide.accent,
   meta: [...slide.meta],
+  buttons: [],
 }));
+
+const isInternalHref = (href: string) => href.startsWith("/") && !href.startsWith("//");
+
+const isExternalHref = (href: string) => /^(https?:)?\/\//i.test(href);
 
 export default function HomePageClient({
   categories,
@@ -44,6 +56,7 @@ export default function HomePageClient({
         meta: banner.meta,
         imageUrl: banner.imageUrl,
         mobileImageUrl: banner.mobileImageUrl,
+        buttons: banner.buttons,
       }))
     : fallbackSlides;
 
@@ -54,7 +67,7 @@ export default function HomePageClient({
           <div key={slide.id}>
             <div className={styles.banner}>
               {slide.imageUrl || slide.mobileImageUrl ? (
-                <picture className={styles.bannerMedia} aria-hidden="true">
+                <picture className={styles.bannerMedia}>
                   {slide.mobileImageUrl ? (
                     <source
                       media="(max-width: 767px)"
@@ -80,6 +93,31 @@ export default function HomePageClient({
                     {slide.meta.map((item) => (
                       <span key={item}>{item}</span>
                     ))}
+                  </div>
+                ) : null}
+                {slide.buttons.length ? (
+                  <div className={styles.bannerActions}>
+                    {slide.buttons.map((button) =>
+                      isInternalHref(button.link) ? (
+                        <Link
+                          className={styles.bannerButton}
+                          href={button.link}
+                          key={button.id}
+                        >
+                          {button.text}
+                        </Link>
+                      ) : (
+                        <a
+                          className={styles.bannerButton}
+                          href={button.link}
+                          key={button.id}
+                          rel={isExternalHref(button.link) ? "noreferrer" : undefined}
+                          target={isExternalHref(button.link) ? "_blank" : undefined}
+                        >
+                          {button.text}
+                        </a>
+                      ),
+                    )}
                   </div>
                 ) : null}
               </div>

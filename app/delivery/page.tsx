@@ -1,57 +1,82 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { DeliveryZoneMap } from "./delivery-zone-map";
+import {
+  buildMetadata,
+  getDeliveryPage,
+  getSiteSettings,
+} from "@/app/lib/site-data";
 import styles from "./styles.module.css";
 
-const DELIVERY_ZONES = [
-  {
-    title: "Москва и Московская область",
-    description:
-      "Доставляем заказы курьером в согласованный день и удобный временной интервал. После оформления обязательно связываемся для подтверждения состава и адреса.",
-    details: [
-      "Бережно упаковываем охлажденные и замороженные продукты.",
-      "Уточняем стоимость доставки по адресу при подтверждении заказа.",
-      "Сообщаем дату ближайшего выезда заранее.",
-    ],
-  },
-  {
-    title: "Санкт-Петербург и Ленинградская область",
-    description:
-      "Отправляем сборные доставки по графику. Если вы оформляете заказ заранее, мы резервируем позиции и подтверждаем дату отправки отдельно.",
-    details: [
-      "Доставка выполняется в согласованный день.",
-      "Перед отправкой менеджер подтверждает наличие и итоговую сумму.",
-      "Для удаленных адресов время и стоимость согласовываются индивидуально.",
-    ],
-  },
-];
+const toPhoneHref = (value: string) => `tel:${value.replace(/[^\d+]/g, "")}`;
 
-const ORDER_STEPS = [
-  "Выберите товары в каталоге и оформите заказ на сайте.",
-  "Мы свяжемся с вами, подтвердим наличие, адрес и удобное время.",
-  "Соберем заказ, бережно упакуем продукты и передадим в доставку.",
-  "В день доставки напомним о заказе и передадим актуальный статус.",
-];
+const isInternalHref = (href: string) =>
+  href.startsWith("/") && !href.startsWith("//");
 
-const PAYMENT_ITEMS = [
-  "Наличными или переводом при получении, если это согласовано при подтверждении заказа.",
-  "Предоплатой для крупных, праздничных и индивидуально собранных заказов.",
-  "Итоговая сумма может корректироваться для весовых позиций после фактической сборки.",
-];
+const isExternalHref = (href: string) => /^(https?:)?\/\//i.test(href);
 
-const IMPORTANT_ITEMS = [
-  "Минимальную сумму заказа и стоимость доставки уточняем при подтверждении, так как они зависят от направления и объема корзины.",
-  "Если какого-то товара не оказалось в наличии, мы заранее предложим замену и ничего не добавим без вашего согласия.",
-  "Просим проверять заказ при получении, чтобы мы сразу помогли решить любой вопрос.",
-];
+const ActionLink = ({
+  children,
+  className,
+  href,
+}: {
+  children: ReactNode;
+  className: string;
+  href: string;
+}) =>
+  isInternalHref(href) ? (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  ) : (
+    <a
+      href={href}
+      className={className}
+      rel={isExternalHref(href) ? "noreferrer" : undefined}
+      target={isExternalHref(href) ? "_blank" : undefined}
+    >
+      {children}
+    </a>
+  );
 
-export const metadata: Metadata = {
-  title: "Доставка | TILI-MILI",
-  description:
-    "Условия доставки фермерских продуктов TILI-MILI по Москве, Московской области, Санкт-Петербургу и Ленинградской области.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [deliveryPage, siteSettings] = await Promise.all([
+    getDeliveryPage(),
+    getSiteSettings(),
+  ]);
 
-export default function DeliveryPage() {
+  return buildMetadata({
+    seo: deliveryPage.seo,
+    fallbackSeo: siteSettings.defaultSeo,
+    titleFallback: "Доставка | TILI-MILI",
+    descriptionFallback: siteSettings.siteDescription,
+    siteName: siteSettings.siteName,
+    faviconUrl: siteSettings.faviconUrl,
+  });
+}
+
+export default async function DeliveryPage() {
+  const [deliveryPage, siteSettings] = await Promise.all([
+    getDeliveryPage(),
+    getSiteSettings(),
+  ]);
+  const { contactSection } = deliveryPage;
+  const sitePrimaryPhone = siteSettings.contacts?.phone;
+  const siteSecondaryPhone = siteSettings.contacts?.secondaryPhone;
+  const primaryPhone = contactSection.useSiteSettingsContacts
+    ? sitePrimaryPhone ?? siteSecondaryPhone ?? contactSection.fallbackPhone
+    : contactSection.fallbackPhone ?? sitePrimaryPhone ?? siteSecondaryPhone;
+  const secondaryPhone =
+    contactSection.useSiteSettingsContacts &&
+    sitePrimaryPhone &&
+    siteSecondaryPhone &&
+    siteSecondaryPhone !== sitePrimaryPhone
+      ? siteSecondaryPhone
+      : undefined;
+  const email = contactSection.useSiteSettingsContacts
+    ? siteSettings.contacts?.email ?? contactSection.fallbackEmail
+    : contactSection.fallbackEmail ?? siteSettings.contacts?.email;
+
   return (
     <div className={styles.page}>
       <nav className={styles.breadcrumbs} aria-label="Хлебные крошки">
@@ -62,91 +87,100 @@ export default function DeliveryPage() {
 
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.kicker}>Доставка фермерских продуктов</span>
-          <h1>Привозим свежие деревенские продукты домой в удобное время</h1>
-          <p>
-            Мы сохраняем аккуратную доставку, бережную упаковку и живое
-            подтверждение каждого заказа без автоматических сюрпризов.
-          </p>
+          <span className={styles.kicker}>{deliveryPage.hero.kicker}</span>
+          <h1>{deliveryPage.hero.title}</h1>
+          <p>{deliveryPage.hero.text}</p>
           <div className={styles.heroActions}>
-            <Link href="/" className={styles.primaryAction}>
-              Перейти в каталог
-            </Link>
-            <a href="tel:+79163672825" className={styles.secondaryAction}>
-              Позвонить менеджеру
-            </a>
+            <ActionLink
+              href={deliveryPage.hero.primaryButtonLink}
+              className={styles.primaryAction}
+            >
+              {deliveryPage.hero.primaryButtonText}
+            </ActionLink>
+            <ActionLink
+              href={deliveryPage.hero.secondaryButtonLink}
+              className={styles.secondaryAction}
+            >
+              {deliveryPage.hero.secondaryButtonText}
+            </ActionLink>
           </div>
         </div>
 
         <div className={styles.heroNote}>
-          <p className={styles.noteTitle}>Как мы работаем</p>
-          <p>
-            После оформления заказа мы всегда подтверждаем наличие товаров,
-            итоговую стоимость и ближайшую дату доставки лично.
-          </p>
+          <p className={styles.noteTitle}>{deliveryPage.hero.noteTitle}</p>
+          <p>{deliveryPage.hero.noteText}</p>
         </div>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeading}>
-          <span>География доставки</span>
-          <h2>Доставляем по основным направлениям</h2>
+          <span>{deliveryPage.zonesSectionKicker}</span>
+          <h2>{deliveryPage.zonesSectionTitle}</h2>
         </div>
 
         <div className={styles.zoneGrid}>
-          {DELIVERY_ZONES.map((zone) => (
+          {deliveryPage.deliveryZones.map((zone) => (
             <article key={zone.title} className={styles.zoneCard}>
               <h3>{zone.title}</h3>
               <p>{zone.description}</p>
-              <ul>
-                {zone.details.map((detail) => (
-                  <li key={detail}>{detail}</li>
-                ))}
-              </ul>
+              {zone.details.length ? (
+                <ul>
+                  {zone.details.map((detail) => (
+                    <li key={detail}>{detail}</li>
+                  ))}
+                </ul>
+              ) : null}
             </article>
           ))}
         </div>
       </section>
 
-      <section className={styles.section}>
-        <div className={styles.sectionHeading}>
-          <span>Проверка адреса</span>
-          <h2>Интерактивная карта зон доставки</h2>
-        </div>
-
-        <DeliveryZoneMap />
-      </section>
-
       <section className={styles.infoLayout}>
         <article className={styles.infoCard}>
-          <span>Оформление</span>
-          <h2>Как проходит заказ</h2>
-          <ol className={styles.stepsList}>
-            {ORDER_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
+          <span>{deliveryPage.orderSection.kicker}</span>
+          <h2>{deliveryPage.orderSection.title}</h2>
+          {deliveryPage.orderSection.listType === "ordered" ? (
+            <ol className={styles.stepsList}>
+              {deliveryPage.orderSection.items.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          ) : (
+            <ul className={styles.simpleList}>
+              {deliveryPage.orderSection.items.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+          )}
         </article>
 
         <article className={styles.infoCard}>
-          <span>Оплата</span>
-          <h2>Условия оплаты</h2>
-          <ul className={styles.simpleList}>
-            {PAYMENT_ITEMS.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <span>{deliveryPage.paymentSection.kicker}</span>
+          <h2>{deliveryPage.paymentSection.title}</h2>
+          {deliveryPage.paymentSection.listType === "ordered" ? (
+            <ol className={styles.stepsList}>
+              {deliveryPage.paymentSection.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ol>
+          ) : (
+            <ul className={styles.simpleList}>
+              {deliveryPage.paymentSection.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
         </article>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeading}>
-          <span>Важно знать</span>
-          <h2>Несколько деталей перед оформлением</h2>
+          <span>{deliveryPage.importantSectionKicker}</span>
+          <h2>{deliveryPage.importantSectionTitle}</h2>
         </div>
 
         <div className={styles.importantGrid}>
-          {IMPORTANT_ITEMS.map((item) => (
+          {deliveryPage.importantItems.map((item) => (
             <article key={item} className={styles.importantCard}>
               <p>{item}</p>
             </article>
@@ -156,22 +190,30 @@ export default function DeliveryPage() {
 
       <section className={styles.contactCard}>
         <div>
-          <span>Есть вопросы?</span>
-          <h2>Поможем подобрать доставку под ваш адрес</h2>
-          <p>
-            Если вы оформляете заказ впервые или хотите уточнить условия по
-            конкретному району, свяжитесь с нами, и мы быстро сориентируем по
-            срокам.
-          </p>
+          <span>{contactSection.kicker}</span>
+          <h2>{contactSection.title}</h2>
+          <p>{contactSection.text}</p>
         </div>
 
         <div className={styles.contactActions}>
-          <a href="tel:+79163672825" className={styles.contactLink}>
-            +7 (916) 367-28-25
-          </a>
-          <a href="mailto:info@tili-mili.ru" className={styles.contactLink}>
-            info@tili-mili.ru
-          </a>
+          {primaryPhone ? (
+            <a href={toPhoneHref(primaryPhone)} className={styles.contactLink}>
+              {primaryPhone}
+            </a>
+          ) : null}
+          {secondaryPhone ? (
+            <a
+              href={toPhoneHref(secondaryPhone)}
+              className={styles.contactLink}
+            >
+              {secondaryPhone}
+            </a>
+          ) : null}
+          {email ? (
+            <a href={`mailto:${email}`} className={styles.contactLink}>
+              {email}
+            </a>
+          ) : null}
         </div>
       </section>
     </div>

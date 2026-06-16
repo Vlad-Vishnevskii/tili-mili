@@ -15,7 +15,10 @@ export const SITE_URL = removeTrailingSlash(
 
 export const STRAPI_SITE_SETTINGS_PATH = "/api/site-setting?populate=*";
 
-export const STRAPI_HOME_PAGE_PATH = "/api/home-page?populate=*";
+export const STRAPI_DELIVERY_PAGE_PATH = "/api/delivery-page";
+
+export const STRAPI_HOME_PAGE_PATH =
+  "/api/home-page?populate[seo][populate]=*&populate[heroBanners][populate][image]=true&populate[heroBanners][populate][mobileImage]=true&populate[heroBanners][populate][buttons]=true";
 
 export const STRAPI_CATEGORIES_PATH =
   "/api/categories?populate[image]=true&populate[seo]=true&populate[descriptionBlocks]=true&populate[products]=true&populate[subcategories][populate][products]=true&sort=sortOrder:asc";

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   getAppIconPath,
   MANIFEST_PATH,
+  STRAPI_DELIVERY_PAGE_PATH,
   SITE_URL,
   STRAPI_HOME_PAGE_PATH,
   STRAPI_SITE_SETTINGS_PATH,
@@ -62,6 +63,12 @@ export type SiteSettings = {
   deliveryTimeIntervalsMsk: SiteDeliveryTimeInterval[];
 };
 
+export type HomeHeroButton = {
+  id: string;
+  text: string;
+  link: string;
+};
+
 export type HomeHeroBanner = {
   id: string;
   title: string;
@@ -70,6 +77,7 @@ export type HomeHeroBanner = {
   meta: string[];
   imageUrl?: string;
   mobileImageUrl?: string;
+  buttons: HomeHeroButton[];
   isActive: boolean;
 };
 
@@ -79,6 +87,54 @@ export type HomePageData = {
   seo: SiteSeo;
   heroBanners: HomeHeroBanner[];
   promoText?: string;
+};
+
+export type DeliveryHero = {
+  kicker: string;
+  title: string;
+  text: string;
+  primaryButtonText: string;
+  primaryButtonLink: string;
+  secondaryButtonText: string;
+  secondaryButtonLink: string;
+  noteTitle: string;
+  noteText: string;
+};
+
+export type DeliveryZone = {
+  title: string;
+  description: string;
+  details: string[];
+};
+
+export type DeliveryListSection = {
+  kicker: string;
+  title: string;
+  items: string[];
+  listType: "ordered" | "unordered";
+};
+
+export type DeliveryContactSection = {
+  kicker: string;
+  title: string;
+  text: string;
+  useSiteSettingsContacts: boolean;
+  fallbackPhone?: string;
+  fallbackEmail?: string;
+};
+
+export type DeliveryPageData = {
+  seo: SiteSeo;
+  hero: DeliveryHero;
+  zonesSectionKicker: string;
+  zonesSectionTitle: string;
+  deliveryZones: DeliveryZone[];
+  orderSection: DeliveryListSection;
+  paymentSection: DeliveryListSection;
+  importantSectionKicker: string;
+  importantSectionTitle: string;
+  importantItems: string[];
+  contactSection: DeliveryContactSection;
 };
 
 const DEFAULT_SITE_NAME = "TILI-MILI";
@@ -131,13 +187,36 @@ const extractSingleType = (payload: unknown): UnknownRecord | null => {
   return unwrapEntry(payload);
 };
 
+const unwrapComponent = (value: unknown): UnknownRecord | null =>
+  extractSingleType(value) ?? unwrapEntry(value);
+
 const extractStringList = (value: unknown): string[] => {
   if (!value) {
     return [];
   }
 
   if (typeof value === "string") {
-    return [value];
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return [];
+    }
+
+    if (trimmedValue.startsWith("[") || trimmedValue.startsWith("{")) {
+      try {
+        return extractStringList(JSON.parse(trimmedValue) as unknown);
+      } catch {
+        return [trimmedValue];
+      }
+    }
+
+    return [trimmedValue];
+  }
+
+  if (isRecord(value)) {
+    return Object.values(value)
+      .flatMap((item) => extractStringList(item))
+      .filter(Boolean);
   }
 
   if (!Array.isArray(value)) {
@@ -165,6 +244,122 @@ const extractStringList = (value: unknown): string[] => {
     .filter(
       (item): item is string => typeof item === "string" && item.length > 0,
     );
+};
+
+const extractArrayEntries = (value: unknown): unknown[] => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  return isRecord(value) && Array.isArray(value.data) ? value.data : [];
+};
+
+const extractPlainText = (value: unknown): string | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return undefined;
+    }
+
+    if (trimmedValue.startsWith("[") || trimmedValue.startsWith("{")) {
+      try {
+        return extractPlainText(JSON.parse(trimmedValue) as unknown);
+      } catch {
+        return trimmedValue;
+      }
+    }
+
+    return trimmedValue;
+  }
+
+  if (Array.isArray(value)) {
+    const text = value
+      .map((item) => extractPlainText(item))
+      .filter((item): item is string => Boolean(item))
+      .join("\n")
+      .trim();
+
+    return text || undefined;
+  }
+
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const directText =
+    getString(value.text) ?? getString(value.value) ?? getString(value.label);
+
+  if (directText) {
+    return directText;
+  }
+
+  return extractPlainText(value.children) ?? extractPlainText(value.content);
+};
+
+const normalizeHeroButtons = (
+  value: unknown,
+  fallback: UnknownRecord,
+): HomeHeroButton[] => {
+  const entries = Array.isArray(value)
+    ? value
+    : isRecord(value) && Array.isArray(value.data)
+      ? value.data
+      : [];
+
+  const buttons = entries
+    .map((item, index): HomeHeroButton | null => {
+      const entry = unwrapEntry(item);
+
+      if (!entry) {
+        return null;
+      }
+
+      const text =
+        getString(entry.text) ??
+        getString(entry.label) ??
+        getString(entry.title) ??
+        getString(entry.buttonText);
+      const link =
+        getString(entry.link) ??
+        getString(entry.href) ??
+        getString(entry.url) ??
+        getString(entry.buttonLink);
+
+      if (!text || !link) {
+        return null;
+      }
+
+      return {
+        id:
+          getString(entry.documentId) ??
+          String(entry.id ?? `${slugify(text)}-${index + 1}`),
+        text,
+        link,
+      };
+    })
+    .filter((item): item is HomeHeroButton => item !== null);
+
+  if (buttons.length) {
+    return buttons;
+  }
+
+  const text = getString(fallback.buttonText);
+  const link = getString(fallback.buttonLink);
+
+  return text && link
+    ? [
+        {
+          id: "legacy-button",
+          text,
+          link,
+        },
+      ]
+    : [];
 };
 
 const extractMediaUrl = (value: unknown): string | null => {
@@ -399,7 +594,10 @@ const normalizeHeroBanners = (value: unknown): HomeHeroBanner[] => {
           getString(item.documentId) ??
           String(item.id ?? `${slugify(title)}-${index + 1}`),
         title,
-        text: getString(item.text) ?? getString(item.description),
+        text:
+          getString(item.text) ??
+          getString(item.subtitle) ??
+          getString(item.description),
         accent:
           getString(item.accent) ??
           getString(item.eyebrow) ??
@@ -411,12 +609,258 @@ const normalizeHeroBanners = (value: unknown): HomeHeroBanner[] => {
         ],
         imageUrl: extractMediaUrl(item.image) ?? undefined,
         mobileImageUrl: extractMediaUrl(item.mobileImage) ?? undefined,
+        buttons: normalizeHeroButtons(item.buttons, item),
         isActive: getBoolean(item.isActive) ?? true,
       };
     })
     .filter((item): item is HomeHeroBanner => item !== null);
 
   return banners.filter((item) => item.isActive);
+};
+
+const normalizeDeliveryHero = (
+  value: unknown,
+  fallback: DeliveryHero,
+): DeliveryHero => {
+  const entry = unwrapComponent(value);
+
+  if (!entry) {
+    return fallback;
+  }
+
+  return {
+    kicker: extractPlainText(entry.kicker) ?? fallback.kicker,
+    title: extractPlainText(entry.title) ?? fallback.title,
+    text: extractPlainText(entry.text) ?? fallback.text,
+    primaryButtonText:
+      extractPlainText(entry.primaryButtonText) ?? fallback.primaryButtonText,
+    primaryButtonLink:
+      getString(entry.primaryButtonLink) ?? fallback.primaryButtonLink,
+    secondaryButtonText:
+      extractPlainText(entry.secondaryButtonText) ??
+      fallback.secondaryButtonText,
+    secondaryButtonLink:
+      getString(entry.secondaryButtonLink) ?? fallback.secondaryButtonLink,
+    noteTitle: extractPlainText(entry.noteTitle) ?? fallback.noteTitle,
+    noteText: extractPlainText(entry.noteText) ?? fallback.noteText,
+  };
+};
+
+const normalizeDeliveryZones = (
+  value: unknown,
+  fallback: DeliveryZone[],
+): DeliveryZone[] => {
+  const zones = extractArrayEntries(value)
+    .map((item): DeliveryZone | null => {
+      const entry = unwrapEntry(item);
+
+      if (!entry) {
+        return null;
+      }
+
+      const title = extractPlainText(entry.title);
+      const description = extractPlainText(entry.description);
+
+      if (!title || !description) {
+        return null;
+      }
+
+      return {
+        title,
+        description,
+        details: extractStringList(entry.details),
+      };
+    })
+    .filter((item): item is DeliveryZone => item !== null);
+
+  return zones.length ? zones : fallback;
+};
+
+const normalizeDeliveryListSection = (
+  value: unknown,
+  fallback: DeliveryListSection,
+): DeliveryListSection => {
+  const entry = unwrapComponent(value);
+
+  if (!entry) {
+    return fallback;
+  }
+
+  const listType = getString(entry.listType);
+  const items = extractStringList(entry.items);
+
+  return {
+    kicker: extractPlainText(entry.kicker) ?? fallback.kicker,
+    title: extractPlainText(entry.title) ?? fallback.title,
+    items: items.length ? items : fallback.items,
+    listType:
+      listType === "ordered" || listType === "unordered"
+        ? listType
+        : fallback.listType,
+  };
+};
+
+const normalizeImportantItems = (
+  value: unknown,
+  fallback: string[],
+): string[] => {
+  const entries = extractArrayEntries(value);
+  const items = entries.length
+    ? entries
+        .map((item) => {
+          const entry = unwrapEntry(item);
+
+          return entry
+            ? extractPlainText(entry.text) ?? extractPlainText(entry.value)
+            : extractPlainText(item);
+        })
+        .filter((item): item is string => Boolean(item))
+    : extractStringList(value);
+
+  return items.length ? items : fallback;
+};
+
+const normalizeDeliveryContactSection = (
+  value: unknown,
+  fallback: DeliveryContactSection,
+): DeliveryContactSection => {
+  const entry = unwrapComponent(value);
+
+  if (!entry) {
+    return fallback;
+  }
+
+  return {
+    kicker: extractPlainText(entry.kicker) ?? fallback.kicker,
+    title: extractPlainText(entry.title) ?? fallback.title,
+    text: extractPlainText(entry.text) ?? fallback.text,
+    useSiteSettingsContacts:
+      getBoolean(entry.useSiteSettingsContacts) ??
+      fallback.useSiteSettingsContacts,
+    fallbackPhone: getString(entry.fallbackPhone) ?? fallback.fallbackPhone,
+    fallbackEmail: getString(entry.fallbackEmail) ?? fallback.fallbackEmail,
+  };
+};
+
+const getFallbackDeliveryPage = (): DeliveryPageData => ({
+  seo: {
+    title: "Доставка | TILI-MILI",
+    description:
+      "Условия доставки фермерских продуктов TILI-MILI по Москве, Московской области, Санкт-Петербургу и Ленинградской области.",
+  },
+  hero: {
+    kicker: "Доставка фермерских продуктов",
+    title: "Привозим свежие деревенские продукты домой в удобное время",
+    text: "Мы сохраняем аккуратную доставку, бережную упаковку и живое подтверждение каждого заказа без автоматических сюрпризов.",
+    primaryButtonText: "Перейти в каталог",
+    primaryButtonLink: "/",
+    secondaryButtonText: "Позвонить менеджеру",
+    secondaryButtonLink: "tel:+79163672825",
+    noteTitle: "Как мы работаем",
+    noteText:
+      "После оформления заказа мы всегда подтверждаем наличие товаров, итоговую стоимость и ближайшую дату доставки лично.",
+  },
+  zonesSectionKicker: "География доставки",
+  zonesSectionTitle: "Доставляем по основным направлениям",
+  deliveryZones: [
+    {
+      title: "Москва и Московская область",
+      description:
+        "Доставляем заказы курьером в согласованный день и удобный временной интервал. После оформления обязательно связываемся для подтверждения состава и адреса.",
+      details: [
+        "Бережно упаковываем охлажденные и замороженные продукты.",
+        "Уточняем стоимость доставки по адресу при подтверждении заказа.",
+        "Сообщаем дату ближайшего выезда заранее.",
+      ],
+    },
+    {
+      title: "Санкт-Петербург и Ленинградская область",
+      description:
+        "Отправляем сборные доставки по графику. Если вы оформляете заказ заранее, мы резервируем позиции и подтверждаем дату отправки отдельно.",
+      details: [
+        "Доставка выполняется в согласованный день.",
+        "Перед отправкой менеджер подтверждает наличие и итоговую сумму.",
+        "Для удаленных адресов время и стоимость согласовываются индивидуально.",
+      ],
+    },
+  ],
+  orderSection: {
+    kicker: "Оформление",
+    title: "Как проходит заказ",
+    listType: "ordered",
+    items: [
+      "Выберите товары в каталоге и оформите заказ на сайте.",
+      "Мы свяжемся с вами, подтвердим наличие, адрес и удобное время.",
+      "Соберем заказ, бережно упакуем продукты и передадим в доставку.",
+      "В день доставки напомним о заказе и передадим актуальный статус.",
+    ],
+  },
+  paymentSection: {
+    kicker: "Оплата",
+    title: "Условия оплаты",
+    listType: "unordered",
+    items: [
+      "Наличными или переводом при получении, если это согласовано при подтверждении заказа.",
+      "Предоплатой для крупных, праздничных и индивидуально собранных заказов.",
+      "Итоговая сумма может корректироваться для весовых позиций после фактической сборки.",
+    ],
+  },
+  importantSectionKicker: "Важно знать",
+  importantSectionTitle: "Несколько деталей перед оформлением",
+  importantItems: [
+    "Минимальную сумму заказа и стоимость доставки уточняем при подтверждении, так как они зависят от направления и объема корзины.",
+    "Если какого-то товара не оказалось в наличии, мы заранее предложим замену и ничего не добавим без вашего согласия.",
+    "Просим проверять заказ при получении, чтобы мы сразу помогли решить любой вопрос.",
+  ],
+  contactSection: {
+    kicker: "Есть вопросы?",
+    title: "Поможем подобрать доставку под ваш адрес",
+    text: "Если вы оформляете заказ впервые или хотите уточнить условия по конкретному району, свяжитесь с нами, и мы быстро сориентируем по срокам.",
+    useSiteSettingsContacts: true,
+    fallbackPhone: "+7 (916) 367-28-25",
+    fallbackEmail: "info@tili-mili.ru",
+  },
+});
+
+const normalizeDeliveryPage = (payload: UnknownRecord): DeliveryPageData => {
+  const fallback = getFallbackDeliveryPage();
+
+  return {
+    seo: normalizeSeo(payload.seo),
+    hero: normalizeDeliveryHero(payload.hero, fallback.hero),
+    zonesSectionKicker:
+      extractPlainText(payload.zonesSectionKicker) ??
+      fallback.zonesSectionKicker,
+    zonesSectionTitle:
+      extractPlainText(payload.zonesSectionTitle) ??
+      fallback.zonesSectionTitle,
+    deliveryZones: normalizeDeliveryZones(
+      payload.deliveryZones,
+      fallback.deliveryZones,
+    ),
+    orderSection: normalizeDeliveryListSection(
+      payload.orderSection,
+      fallback.orderSection,
+    ),
+    paymentSection: normalizeDeliveryListSection(
+      payload.paymentSection,
+      fallback.paymentSection,
+    ),
+    importantSectionKicker:
+      extractPlainText(payload.importantSectionKicker) ??
+      fallback.importantSectionKicker,
+    importantSectionTitle:
+      extractPlainText(payload.importantSectionTitle) ??
+      fallback.importantSectionTitle,
+    importantItems: normalizeImportantItems(
+      payload.importantItems,
+      fallback.importantItems,
+    ),
+    contactSection: normalizeDeliveryContactSection(
+      payload.contactSection,
+      fallback.contactSection,
+    ),
+  };
 };
 
 const getFallbackSiteSettings = (): SiteSettings => ({
@@ -515,6 +959,20 @@ export const getHomePage = async (): Promise<HomePageData> => {
     };
   } catch {
     return getFallbackHomePage();
+  }
+};
+
+export const getDeliveryPage = async (): Promise<DeliveryPageData> => {
+  try {
+    const payload = await fetchStrapiSingle(STRAPI_DELIVERY_PAGE_PATH);
+
+    if (!payload) {
+      return getFallbackDeliveryPage();
+    }
+
+    return normalizeDeliveryPage(payload);
+  } catch {
+    return getFallbackDeliveryPage();
   }
 };
 

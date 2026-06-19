@@ -3,6 +3,76 @@
   max-width: 1080px;
 }
 
+.heroCarousel {
+  position: relative;
+  width: 100%;
+}
+
+.heroSwiper {
+  width: 100%;
+  padding-bottom: 30px !important;
+
+  :global(.swiper-pagination) {
+    bottom: 2px !important;
+  }
+
+  :global(.swiper-pagination-bullet) {
+    width: 8px;
+    height: 8px;
+    background-color: #607d83;
+    opacity: 0.3;
+  }
+
+  :global(.swiper-pagination-bullet-active) {
+    background-color: #d6a652;
+    opacity: 1;
+  }
+
+}
+
+.heroSlide {
+  height: auto !important;
+}
+
+.heroPrev,
+.heroNext {
+  position: absolute;
+  top: calc(50% - 15px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background-color: #607d83;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(96, 125, 131, 0.22);
+  transform: translateY(-50%);
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+.heroPrev {
+  left: -54px;
+}
+
+.heroNext {
+  right: -54px;
+}
+
+.heroPrev:hover,
+.heroNext:hover {
+  background-color: #4e686d;
+}
+
 .page {
   --background: #ffffff;
 

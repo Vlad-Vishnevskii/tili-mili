@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Flex, Carousel } from "antd";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { Flex } from "antd";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { CATEGORY_CARD_COPY, HERO_SLIDES } from "./constants";
 import type { CatalogCategory } from "@/app/lib/catalog";
 import type { HomePageData } from "@/app/lib/site-data";
@@ -59,13 +65,39 @@ export default function HomePageClient({
         buttons: banner.buttons,
       }))
     : fallbackSlides;
+  const hasMultipleHeroSlides = heroSlides.length > 1;
 
   return (
     <Flex vertical gap={48} className={styles.home}>
-      <Carousel arrows autoplay>
-        {heroSlides.map((slide) => (
-          <div key={slide.id}>
-            <div className={styles.banner}>
+      <div className={styles.heroCarousel}>
+        <Swiper
+          className={styles.heroSwiper}
+          modules={[Autoplay, Navigation, Pagination]}
+          autoplay={
+            hasMultipleHeroSlides
+              ? {
+                  delay: 5000,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }
+              : false
+          }
+          loop={hasMultipleHeroSlides}
+          navigation={
+            hasMultipleHeroSlides
+              ? {
+                  prevEl: `.${styles.heroPrev}`,
+                  nextEl: `.${styles.heroNext}`,
+                }
+              : false
+          }
+          pagination={hasMultipleHeroSlides ? { clickable: true } : false}
+          slidesPerView={1}
+          spaceBetween={20}
+        >
+          {heroSlides.map((slide) => (
+            <SwiperSlide className={styles.heroSlide} key={slide.id}>
+              <div className={styles.banner}>
               {slide.imageUrl || slide.mobileImageUrl ? (
                 <picture className={styles.bannerMedia}>
                   {slide.mobileImageUrl ? (
@@ -121,10 +153,30 @@ export default function HomePageClient({
                   </div>
                 ) : null}
               </div>
-            </div>
-          </div>
-        ))}
-      </Carousel>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        {hasMultipleHeroSlides ? (
+          <>
+            <button
+              type="button"
+              className={styles.heroPrev}
+              aria-label="Предыдущий баннер"
+            >
+              <LeftOutlined />
+            </button>
+            <button
+              type="button"
+              className={styles.heroNext}
+              aria-label="Следующий баннер"
+            >
+              <RightOutlined />
+            </button>
+          </>
+        ) : null}
+      </div>
 
       <section className={styles.categoriesSection}>
         <div className={styles.sectionHeading}>

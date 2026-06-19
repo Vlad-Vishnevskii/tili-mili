@@ -133,7 +133,7 @@
   .mobileCompact .mobileSearchBlock {
     gap: 0;
     padding: 0;
-    border: 0;
+    border-color: transparent;
     border-radius: 0;
     background: transparent;
     box-shadow: none;
@@ -454,9 +454,24 @@
 
 .search {
   width: 100%;
+  outline: none !important;
 
   :global(.ant-input-group-wrapper) {
     width: 100%;
+    outline: none !important;
+  }
+
+  :global(.ant-input-wrapper),
+  :global(.ant-input-group) {
+    outline: none !important;
+    border-radius: 18px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  :global(.ant-input-wrapper:focus-within),
+  :global(.ant-input-group:focus-within) {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(96, 125, 131, 0.18);
   }
 
   :global(.ant-input-group .ant-input),
@@ -466,14 +481,29 @@
 
   :global(.ant-input-group .ant-input) {
     font-size: 16px;
+    outline: none !important;
     border-radius: 18px 0 0 18px;
     background-color: #ffffff;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
   }
 
+  :global(.ant-input:focus),
+  :global(.ant-input-focused) {
+    outline: none !important;
+    border-color: #607d83 !important;
+    box-shadow: none !important;
+  }
+
   :global(.ant-input-search-button) {
     min-width: 58px;
+    outline: none !important;
     border-radius: 0 18px 18px 0;
+  }
+
+  :global(.ant-input-search-button:focus),
+  :global(.ant-input-search-button:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
   }
 
   @media (max-width: 767px) {
@@ -715,6 +745,11 @@
   font-size: 20px;
 
   @media (max-width: 767px) {
+    :global(.ant-input-wrapper),
+    :global(.ant-input-group) {
+      border-radius: 16px;
+    }
+
     max-width: 48px;
     font-size: 21px;
     opacity: 1;

@@ -122,6 +122,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   const [searchValue, setSearchValue] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileCompact, setIsMobileCompact] = useState(false);
+  const [isHeaderTransitioning, setIsHeaderTransitioning] = useState(false);
 
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const searchResults = normalizedSearchValue
@@ -184,6 +185,34 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   useEffect(() => {
     const mobileMedia = window.matchMedia("(max-width: 900px)");
     let animationFrameId = 0;
+    let fadeOutTimeoutId = 0;
+    let fadeInTimeoutId = 0;
+    let compactState = false;
+    let transitionTarget: boolean | null = null;
+
+    const transitionToCompactState = (nextCompactState: boolean) => {
+      if (
+        transitionTarget === nextCompactState ||
+        (transitionTarget === null && compactState === nextCompactState)
+      ) {
+        return;
+      }
+
+      window.clearTimeout(fadeOutTimeoutId);
+      window.clearTimeout(fadeInTimeoutId);
+      transitionTarget = nextCompactState;
+      setIsHeaderTransitioning(true);
+
+      fadeOutTimeoutId = window.setTimeout(() => {
+        compactState = nextCompactState;
+        transitionTarget = null;
+        setIsMobileCompact(nextCompactState);
+
+        fadeInTimeoutId = window.setTimeout(() => {
+          setIsHeaderTransitioning(false);
+        }, 140);
+      }, 120);
+    };
 
     const updateMobileHeader = () => {
       const scrollTop = Math.max(
@@ -202,15 +231,14 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
         );
       }
 
-      setIsMobileCompact((isCompact) => {
-        if (!mobileMedia.matches) {
-          return false;
-        }
-
-        return isCompact
+      const effectiveCompactState = transitionTarget ?? compactState;
+      const nextCompactState = mobileMedia.matches
+        ? effectiveCompactState
           ? scrollTop > MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y
-          : scrollTop > MOBILE_HEADER_COMPACT_ENTER_SCROLL_Y;
-      });
+          : scrollTop > MOBILE_HEADER_COMPACT_ENTER_SCROLL_Y
+        : false;
+
+      transitionToCompactState(nextCompactState);
     };
 
     const handleScroll = () => {
@@ -225,6 +253,8 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
 
     return () => {
       window.cancelAnimationFrame(animationFrameId);
+      window.clearTimeout(fadeOutTimeoutId);
+      window.clearTimeout(fadeInTimeoutId);
       window.removeEventListener("scroll", handleScroll);
       document.body.removeEventListener("scroll", handleScroll);
       mobileMedia.removeEventListener("change", updateMobileHeader);
@@ -320,6 +350,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
       ref={headerRef}
       className={classnames(styles.wrapper, {
         [styles.mobileCompact]: isMobileCompact,
+        [styles.headerTransitioning]: isHeaderTransitioning,
       })}
     >
       <div className={styles.container}>

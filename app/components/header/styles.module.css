@@ -37,7 +37,10 @@
 
 @media (max-width: 900px) {
   .container {
-    transition: padding 0.24s ease;
+    opacity: 1;
+    transition:
+      padding 0.24s ease,
+      opacity 0.12s ease;
   }
 
   .brandLink {
@@ -75,6 +78,25 @@
     box-shadow: none;
     backdrop-filter: none;
     pointer-events: none;
+  }
+
+  .headerTransitioning .container,
+  .headerTransitioning .navbarContainer {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .headerTransitioning .heroCard,
+  .headerTransitioning .headerGrid,
+  .headerTransitioning .brandLink,
+  .headerTransitioning .phone,
+  .headerTransitioning .mobileSearchBlock,
+  .headerTransitioning .mobileSearchMeta {
+    transition: none;
+  }
+
+  .headerTransitioning .navbarContainer {
+    transition: opacity 0.12s ease;
   }
 
   .mobileCompact::before {

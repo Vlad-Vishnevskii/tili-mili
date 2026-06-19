@@ -35,6 +35,148 @@
   }
 }
 
+@media (max-width: 900px) {
+  .container {
+    transition: padding 0.24s ease;
+  }
+
+  .brandLink {
+    max-width: 120px;
+    max-height: 110px;
+    opacity: 1;
+    overflow: hidden;
+    transition:
+      max-width 0.24s ease,
+      max-height 0.24s ease,
+      opacity 0.18s ease;
+  }
+
+  .phone {
+    max-width: 54px;
+    opacity: 1;
+    overflow: hidden;
+    transition:
+      max-width 0.24s ease,
+      opacity 0.16s ease;
+  }
+
+  .mobileSearchMeta {
+    max-height: 40px;
+    opacity: 1;
+    transition:
+      max-height 0.24s ease,
+      opacity 0.16s ease,
+      transform 0.24s ease;
+  }
+
+  .mobileCompact {
+    min-height: var(--mobile-header-expanded-height, 278px);
+    background-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    pointer-events: none;
+  }
+
+  .mobileCompact::before {
+    right: 0;
+    bottom: auto;
+    height: 69px;
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 10px 28px rgba(96, 125, 131, 0.14);
+  }
+
+  .mobileCompact .container {
+    padding: 0 8px 8px;
+    pointer-events: auto;
+  }
+
+  .mobileCompact .heroCard {
+    padding: 8px;
+    border-radius: 0 0 18px 18px;
+    box-shadow: none;
+  }
+
+  .mobileCompact .headerGrid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobileCompact .mobileTopRow {
+    grid-column: 2;
+    grid-row: 1;
+    width: auto;
+  }
+
+  .mobileCompact .brandLink,
+  .mobileCompact .phone {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .mobileCompact .brandLink {
+    max-height: 0;
+  }
+
+  .mobileCompact .rightIcons {
+    gap: 0;
+  }
+
+  .mobileCompact .mobileHeaderBox {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .mobileCompact .mobileSearchBlock {
+    gap: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .mobileCompact .mobileSearchMeta {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateY(-4px);
+  }
+
+  .mobileCompact .navbarContainer {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .mobileCompact .search {
+    :global(.ant-input-group .ant-input),
+    :global(.ant-input-search-button) {
+      height: 44px;
+    }
+
+    :global(.ant-input-group .ant-input) {
+      border-radius: 14px 0 0 14px;
+    }
+
+    :global(.ant-input-search-button) {
+      min-width: 48px;
+      border-radius: 0 14px 14px 0;
+    }
+  }
+
+  .mobileCompact .searchResults {
+    max-height: min(60vh, calc(100vh - 76px));
+  }
+}
+
 .container {
   position: relative;
   z-index: 1;
@@ -47,6 +189,7 @@
 
   @media (max-width: 767px) {
     padding: 0 12px;
+    transition: padding 0.24s ease;
   }
 }
 
@@ -59,6 +202,7 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
     gap: 8px;
+    transition: gap 0.24s ease;
   }
 }
 
@@ -98,6 +242,10 @@
       ),
       rgba(255, 255, 255, 0.92);
     box-shadow: 0 12px 30px rgba(96, 125, 131, 0.14);
+    transition:
+      padding 0.24s ease,
+      border-radius 0.24s ease,
+      box-shadow 0.24s ease;
   }
 }
 
@@ -135,6 +283,14 @@
 
   @media (max-width: 767px) {
     min-width: 0;
+    max-width: 110px;
+    max-height: 100px;
+    opacity: 1;
+    overflow: hidden;
+    transition:
+      max-width 0.24s ease,
+      max-height 0.24s ease,
+      opacity 0.18s ease;
   }
 }
 
@@ -244,6 +400,13 @@
     );
     border-color: rgba(214, 166, 82, 0.22);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    transition:
+      padding 0.24s ease,
+      gap 0.24s ease,
+      border-color 0.24s ease,
+      border-radius 0.24s ease,
+      background-color 0.24s ease,
+      box-shadow 0.24s ease;
   }
 }
 
@@ -255,6 +418,12 @@
 
   @media (max-width: 767px) {
     gap: 10px;
+    max-height: 40px;
+    opacity: 1;
+    transition:
+      max-height 0.24s ease,
+      opacity 0.16s ease,
+      transform 0.24s ease;
   }
 }
 
@@ -546,7 +715,13 @@
   font-size: 20px;
 
   @media (max-width: 767px) {
+    max-width: 48px;
     font-size: 21px;
+    opacity: 1;
+    overflow: hidden;
+    transition:
+      max-width 0.24s ease,
+      opacity 0.16s ease;
   }
 }
 
@@ -772,6 +947,12 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-snap-type: x proximity;
+    max-height: 70px;
+    opacity: 1;
+    transition:
+      max-height 0.24s ease,
+      padding 0.24s ease,
+      opacity 0.16s ease;
   }
 }
 

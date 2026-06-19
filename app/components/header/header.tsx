@@ -22,6 +22,8 @@ import { useCart } from "@/app/providers/cart-provider";
 
 const DESKTOP_NAV_SCROLL_STEP = 280;
 const SEARCH_RESULTS_LIMIT = 8;
+const MOBILE_HEADER_COMPACT_ENTER_SCROLL_Y = 80;
+const MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y = 8;
 const DEFAULT_PHONE_NUMBER = "+79163672825";
 const DEFAULT_PROMO_TEXT = "Фермерские продукты из деревни";
 
@@ -112,12 +114,14 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   const { cartItems, clearCart, removeCartItem, updateCartItemQuantity } =
     useCart();
   const desktopNavRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
   const searchRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMobileCompact, setIsMobileCompact] = useState(false);
 
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const searchResults = normalizedSearchValue
@@ -176,6 +180,56 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
     DEFAULT_PHONE_NUMBER;
   const promoText = siteSettings.promoText ?? DEFAULT_PROMO_TEXT;
   const phoneHref = toPhoneHref(primaryPhone);
+
+  useEffect(() => {
+    const mobileMedia = window.matchMedia("(max-width: 900px)");
+    let animationFrameId = 0;
+
+    const updateMobileHeader = () => {
+      const scrollTop = Math.max(
+        window.scrollY,
+        document.documentElement.scrollTop,
+        document.body.scrollTop,
+      );
+
+      if (
+        mobileMedia.matches &&
+        scrollTop <= MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y
+      ) {
+        headerRef.current?.style.setProperty(
+          "--mobile-header-expanded-height",
+          `${headerRef.current.getBoundingClientRect().height}px`,
+        );
+      }
+
+      setIsMobileCompact((isCompact) => {
+        if (!mobileMedia.matches) {
+          return false;
+        }
+
+        return isCompact
+          ? scrollTop > MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y
+          : scrollTop > MOBILE_HEADER_COMPACT_ENTER_SCROLL_Y;
+      });
+    };
+
+    const handleScroll = () => {
+      window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = window.requestAnimationFrame(updateMobileHeader);
+    };
+
+    updateMobileHeader();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.body.addEventListener("scroll", handleScroll, { passive: true });
+    mobileMedia.addEventListener("change", updateMobileHeader);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("scroll", handleScroll);
+      document.body.removeEventListener("scroll", handleScroll);
+      mobileMedia.removeEventListener("change", updateMobileHeader);
+    };
+  }, []);
 
   useEffect(() => {
     const navElement = desktopNavRef.current;
@@ -262,7 +316,12 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   };
 
   return (
-    <header className={styles.wrapper}>
+    <header
+      ref={headerRef}
+      className={classnames(styles.wrapper, {
+        [styles.mobileCompact]: isMobileCompact,
+      })}
+    >
       <div className={styles.container}>
         <div className={styles.heroCard}>
           <div className={styles.headerGrid}>

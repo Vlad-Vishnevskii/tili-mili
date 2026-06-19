@@ -5,15 +5,18 @@ import type { CatalogProduct } from "@/app/lib/catalog";
 import { getDeliveryDateItems } from "@/app/lib/delivery-dates";
 import type { SiteSettings } from "@/app/lib/site-data";
 import { PurchaseControls } from "./purchase-controls";
+import { ProductRecommendations } from "./product-recommendations";
 import styles from "./styles.module.css";
 
 type ProductPageClientProps = {
   product: CatalogProduct | null;
+  recommendedProducts: CatalogProduct[];
   siteSettings: Pick<SiteSettings, "deliveryDateSpb" | "deliveryDateMsk">;
 };
 
 export const ProductPageClient = ({
   product,
+  recommendedProducts,
   siteSettings,
 }: ProductPageClientProps) => {
   const deliveryDates = getDeliveryDateItems(siteSettings);
@@ -141,6 +144,8 @@ export const ProductPageClient = ({
           </div>
         </div>
       </section>
+
+      <ProductRecommendations products={recommendedProducts} />
     </div>
   );
 };

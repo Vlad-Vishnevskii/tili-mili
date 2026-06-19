@@ -771,7 +771,7 @@ export const CartModal = ({
             <aside className={styles.summaryColumn}>
               <div className={styles.summaryStats}>
                 <div className={styles.summaryRow}>
-                  <span>Кол-во товаров</span>
+                  <span>Кол-во позиций</span>
                   <strong>{totalItems}</strong>
                 </div>
                 <div className={styles.summaryRow}>

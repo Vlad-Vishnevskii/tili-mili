@@ -514,12 +514,17 @@ export const CartModal = ({
                           <button
                             type="button"
                             className={styles.itemCounterButton}
-                            onClick={() =>
+                            onClick={() => {
+                              if (item.quantity <= 1) {
+                                onRemoveItem(item.product.id);
+                                return;
+                              }
+
                               onUpdateQuantity(
                                 item.product.id,
-                                Math.max(0, item.quantity - 1),
-                              )
-                            }
+                                item.quantity - 1,
+                              );
+                            }}
                             aria-label="Уменьшить количество"
                           >
                             <MinusOutlined />

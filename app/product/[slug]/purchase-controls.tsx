@@ -94,7 +94,9 @@ export const PurchaseControls = ({
             type="button"
             className={styles.counterButton}
             onClick={() =>
-              handlePortionCountChange(Math.max(1, portionCount - 1))
+              handlePortionCountChange(
+                cartItem ? portionCount - 1 : Math.max(1, portionCount - 1),
+              )
             }
             aria-label="Уменьшить количество"
           >

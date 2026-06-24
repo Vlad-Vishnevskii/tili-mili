@@ -4,6 +4,7 @@ import { Button } from "antd";
 import { useState } from "react";
 import {
   calculateItemTotal,
+  formatPackageWeight,
   isWeightPricedUnit,
 } from "@/app/lib/pricing";
 import { useCart } from "@/app/providers/cart-provider";
@@ -17,8 +18,6 @@ type PurchaseControlsProps = {
   packageWeight?: number;
   isOutOfStock?: boolean;
 };
-
-const formatWeight = (value: number) => value.toFixed(1).replace(".", ",");
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
@@ -82,7 +81,7 @@ export const PurchaseControls = ({
         <div className={styles.packageCard}>
           <span className={styles.packageLabel}>Стандартная упаковка</span>
           <strong className={styles.packageWeight}>
-            {formatWeight(packageWeight)} {unitName}
+            {formatPackageWeight(packageWeight)} {unitName}
           </strong>
           <span className={styles.packagePrice}>
             {priceDetails}
@@ -106,7 +105,7 @@ export const PurchaseControls = ({
           <div className={styles.counterValue}>
             <strong>{portionCount}</strong>
             <span>
-              {formatWeight(totalWeight)} {unitName}
+              {formatPackageWeight(totalWeight)} {unitName}
             </span>
           </div>
 

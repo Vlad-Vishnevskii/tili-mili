@@ -20,6 +20,7 @@ import {
   type DeliveryRegion,
 } from "@/app/lib/delivery-dates";
 import { createOrderRequest } from "@/app/lib/order-requests";
+import { formatPackageWeight } from "@/app/lib/pricing";
 import type { SiteSettings } from "@/app/lib/site-data";
 import styles from "./cart-modal.module.css";
 
@@ -88,8 +89,6 @@ const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
     maximumFractionDigits: 0,
   }).format(Math.round(value));
-
-const formatWeight = (value: number) => value.toFixed(1).replace(".", ",");
 
 const formatPhone = (value: string) => {
   const digits = value.replace(/\D/g, "").replace(/^8/, "7").slice(0, 11);
@@ -501,7 +500,7 @@ export const CartModal = ({
                           {item.product.name}
                         </Link>
                         <div className={styles.itemMeta}>
-                          {formatWeight(item.packageWeight)}{" "}
+                          {formatPackageWeight(item.packageWeight)}{" "}
                           {item.product.unit.name} / шт
                         </div>
                         <div className={styles.itemSubmeta}>
@@ -781,7 +780,7 @@ export const CartModal = ({
                 </div>
                 <div className={styles.summaryRow}>
                   <span>Вес посылки</span>
-                  <strong>{formatWeight(totalWeight)} кг</strong>
+                  <strong>{formatPackageWeight(totalWeight)} кг</strong>
                 </div>
                 <div className={styles.summaryRow}>
                   <span>Итого:</span>

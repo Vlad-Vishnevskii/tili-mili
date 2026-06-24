@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   calculateItemTotal,
+  formatPackageWeight,
   isWeightPricedUnit,
 } from "@/app/lib/pricing";
 import { useCart } from "@/app/providers/cart-provider";
@@ -19,8 +20,6 @@ type ProductCardPurchaseProps = {
   packageWeight?: number;
   isOutOfStock?: boolean;
 };
-
-const formatWeight = (value: number) => value.toFixed(1).replace(".", ",");
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("ru-RU", {
@@ -87,7 +86,7 @@ export const ProductCardPurchase = ({
         <div className={styles.cardPurchaseInfo}>
           <span className={styles.cardPurchaseLabel}>Стандарт</span>
           <strong>
-            {formatWeight(totalWeight)} {unitName}
+            {formatPackageWeight(totalWeight)} {unitName}
           </strong>
           <span className={styles.cardPurchasePrice}>
             {priceDetails}

@@ -4,6 +4,12 @@ export const isWeightPricedUnit = (unitName: string) => {
   return normalizedUnitName === "кг" || normalizedUnitName === "kg";
 };
 
+export const formatPackageWeight = (value: number) =>
+  new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value);
+
 type CalculateItemTotalParams = {
   packageWeight: number;
   quantity: number;

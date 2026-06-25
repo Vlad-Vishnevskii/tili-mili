@@ -40,17 +40,20 @@ type HeroSlideViewModel = {
   buttons: HeroButtonViewModel[];
 };
 
-const fallbackSlides: HeroSlideViewModel[] = HERO_SLIDES.map((slide, index) => ({
-  id: `fallback-slide-${index + 1}`,
-  title: slide.title,
-  text: slide.text,
-  accent: slide.accent,
-  meta: [...slide.meta],
-  blurBackground: true,
-  buttons: [],
-}));
+const fallbackSlides: HeroSlideViewModel[] = HERO_SLIDES.map(
+  (slide, index) => ({
+    id: `fallback-slide-${index + 1}`,
+    title: slide.title,
+    text: slide.text,
+    accent: slide.accent,
+    meta: [...slide.meta],
+    blurBackground: true,
+    buttons: [],
+  }),
+);
 
-const isInternalHref = (href: string) => href.startsWith("/") && !href.startsWith("//");
+const isInternalHref = (href: string) =>
+  href.startsWith("/") && !href.startsWith("//");
 
 const isExternalHref = (href: string) => /^(https?:)?\/\//i.test(href);
 
@@ -110,61 +113,67 @@ export default function HomePageClient({
                   [styles.bannerOriginalImage]: !slide.blurBackground,
                 })}
               >
-              {slide.imageUrl || slide.mobileImageUrl ? (
-                <picture className={styles.bannerMedia}>
-                  {slide.mobileImageUrl ? (
-                    <source
-                      media="(max-width: 767px)"
-                      srcSet={slide.mobileImageUrl}
+                {slide.imageUrl || slide.mobileImageUrl ? (
+                  <picture className={styles.bannerMedia}>
+                    {slide.mobileImageUrl ? (
+                      <source
+                        media="(max-width: 767px)"
+                        srcSet={slide.mobileImageUrl}
+                      />
+                    ) : null}
+                    <img
+                      src={slide.imageUrl ?? slide.mobileImageUrl}
+                      alt=""
+                      className={styles.bannerMediaImage}
                     />
+                  </picture>
+                ) : null}
+                <div className={styles.bannerGlow} />
+                <div className={styles.bannerContent}>
+                  {slide.accent ? (
+                    <span className={styles.bannerAccent}>{slide.accent}</span>
                   ) : null}
-                  <img
-                    src={slide.imageUrl ?? slide.mobileImageUrl}
-                    alt=""
-                    className={styles.bannerMediaImage}
-                  />
-                </picture>
-              ) : null}
-              <div className={styles.bannerGlow} />
-              <div className={styles.bannerContent}>
-                {slide.accent ? (
-                  <span className={styles.bannerAccent}>{slide.accent}</span>
-                ) : null}
-                <h2>{slide.title}</h2>
-                {slide.text ? <p>{slide.text}</p> : null}
-                {slide.meta.length ? (
-                  <div className={styles.bannerMeta}>
-                    {slide.meta.map((item) => (
-                      <span key={item}>{item}</span>
-                    ))}
-                  </div>
-                ) : null}
-                {slide.buttons.length ? (
-                  <div className={styles.bannerActions}>
-                    {slide.buttons.map((button) =>
-                      isInternalHref(button.link) ? (
-                        <Link
-                          className={styles.bannerButton}
-                          href={button.link}
-                          key={button.id}
-                        >
-                          {button.text}
-                        </Link>
-                      ) : (
-                        <a
-                          className={styles.bannerButton}
-                          href={button.link}
-                          key={button.id}
-                          rel={isExternalHref(button.link) ? "noreferrer" : undefined}
-                          target={isExternalHref(button.link) ? "_blank" : undefined}
-                        >
-                          {button.text}
-                        </a>
-                      ),
-                    )}
-                  </div>
-                ) : null}
-              </div>
+                  <h2>{slide.title}</h2>
+                  {slide.text ? <p>{slide.text}</p> : null}
+                  {slide.meta.length ? (
+                    <div className={styles.bannerMeta}>
+                      {slide.meta.map((item) => (
+                        <span key={item}>{item}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                  {slide.buttons.length ? (
+                    <div className={styles.bannerActions}>
+                      {slide.buttons.map((button) =>
+                        isInternalHref(button.link) ? (
+                          <Link
+                            className={styles.bannerButton}
+                            href={button.link}
+                            key={button.id}
+                          >
+                            {button.text}
+                          </Link>
+                        ) : (
+                          <a
+                            className={styles.bannerButton}
+                            href={button.link}
+                            key={button.id}
+                            rel={
+                              isExternalHref(button.link)
+                                ? "noreferrer"
+                                : undefined
+                            }
+                            target={
+                              isExternalHref(button.link) ? "_blank" : undefined
+                            }
+                          >
+                            {button.text}
+                          </a>
+                        ),
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </SwiperSlide>
           ))}
@@ -193,7 +202,9 @@ export default function HomePageClient({
       <section className={styles.categoriesSection}>
         <div className={styles.sectionHeading}>
           {homePage.promoText ? <span>{homePage.promoText}</span> : null}
-          <h2>{homePage.title ?? "Вкусные продукты из деревни с чистым составом"}</h2>
+          <h2>
+            {homePage.title ?? "Вкусные продукты из деревни с чистым составом"}
+          </h2>
           <p>
             От основного семейного заказа до деликатесов, подарочных наборов и
             сезонных позиций для красивого стола.
@@ -216,23 +227,6 @@ export default function HomePageClient({
                 />
               </div>
               <div className={styles.categoryBody}>
-                {deliveryDates.length ? (
-                  <div className={styles.deliveryDates}>
-                    {deliveryDates.map((dateItem) => (
-                      <span
-                        key={dateItem.region}
-                        className={classnames(styles.deliveryDate, {
-                          [styles.deliveryDateMsk]:
-                            dateItem.region === "msk",
-                          [styles.deliveryDateSpb]:
-                            dateItem.region === "spb",
-                        })}
-                      >
-                        {dateItem.city}: {dateItem.date}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
                 <strong>{item.name}</strong>
                 <p>{CATEGORY_CARD_COPY}</p>
               </div>

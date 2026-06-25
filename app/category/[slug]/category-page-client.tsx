@@ -60,13 +60,13 @@ export const CategoryPageClient = ({
   siteSettings,
 }: CategoryPageClientProps) => {
   const selectedSubcategory = selectedSubcategorySlug
-    ? category?.subCategories.find((item) => item.slug === selectedSubcategorySlug) ??
-      null
+    ? (category?.subCategories.find(
+        (item) => item.slug === selectedSubcategorySlug,
+      ) ?? null)
     : null;
-  const relationProductIds =
-    selectedSubcategory?.productIds.length
-      ? selectedSubcategory.productIds
-      : category?.productIds ?? [];
+  const relationProductIds = selectedSubcategory?.productIds.length
+    ? selectedSubcategory.productIds
+    : (category?.productIds ?? []);
   const categoryProducts = sortProductsByRelationOrder(
     products.filter((product) => {
       if (selectedSubcategory?.productIds.length) {
@@ -160,7 +160,9 @@ export const CategoryPageClient = ({
               <span>позиций в наличии</span>
             </div>
             <div className={styles.factCard}>
-              <strong>{minPrice ? `от ${formatPrice(minPrice)} ₽` : "по запросу"}</strong>
+              <strong>
+                {minPrice ? `от ${formatPrice(minPrice)} ₽` : "по запросу"}
+              </strong>
               <span>стартовая цена</span>
             </div>
           </div>
@@ -226,9 +228,7 @@ export const CategoryPageClient = ({
                     ) : null}
 
                     {card.dietLabel ? (
-                      <span className={styles.dietBadge}>
-                        {card.dietLabel}
-                      </span>
+                      <span className={styles.dietBadge}>{card.dietLabel}</span>
                     ) : null}
                   </div>
                 ) : null}
@@ -243,11 +243,34 @@ export const CategoryPageClient = ({
                     label={card.freezeLabel}
                   />
                 ) : null}
-                <Image src={card.img} width={320} height={280} alt={card.name} />
+                <Image
+                  src={card.img}
+                  width={320}
+                  height={280}
+                  alt={card.name}
+                />
               </Link>
 
               <div className={styles.cardBody}>
-                <span className={styles.cardMeta}>Фермерский продукт</span>
+                {deliveryDates.length ? (
+                  <div className={styles.deliveryDates}>
+                    {deliveryDates.map((item) => (
+                      <span
+                        key={item.region}
+                        className={`${styles.deliveryDate} ${
+                          item.region === "msk"
+                            ? styles.deliveryDateMsk
+                            : styles.deliveryDateSpb
+                        }`}
+                      >
+                        {item.city}: {item.date}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+
+                {/* <span className={styles.cardMeta}>Фермерский продукт</span> */}
+
                 <h3>
                   <Link href={card.link} className={styles.cardTitleLink}>
                     {card.name}
@@ -257,16 +280,6 @@ export const CategoryPageClient = ({
                   {card.description[0]?.text ??
                     "Свежий продукт с аккуратной подготовкой и понятным составом."}
                 </p>
-
-                {deliveryDates.length ? (
-                  <div className={styles.deliveryDates}>
-                    {deliveryDates.map((item) => (
-                      <span key={item.city} className={styles.deliveryDate}>
-                        {item.city}: {item.date}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
 
                 <div className={styles.cardFooter}>
                   <ProductCardPurchase

@@ -377,11 +377,24 @@
   min-height: 28px;
   padding: 6px 9px;
   border-radius: 999px;
-  background-color: rgba(96, 125, 131, 0.1);
-  color: #3f555a;
+  border: 1px solid transparent;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
+}
+
+.deliveryDateMsk {
+  background-color: rgba(214, 166, 82, 0.18);
+  border-color: rgba(214, 166, 82, 0.36);
+  color: #7d5b18;
+  box-shadow: 0 8px 18px rgba(214, 166, 82, 0.14);
+}
+
+.deliveryDateSpb {
+  background-color: rgba(96, 125, 131, 0.14);
+  border-color: rgba(96, 125, 131, 0.32);
+  color: #3f555a;
+  box-shadow: 0 8px 18px rgba(96, 125, 131, 0.12);
 }
 
 .cardFooter {

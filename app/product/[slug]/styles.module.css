@@ -252,11 +252,24 @@
   min-height: 32px;
   padding: 7px 10px;
   border-radius: 999px;
-  background-color: rgba(96, 125, 131, 0.1);
-  color: #3f555a;
+  border: 1px solid transparent;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
+}
+
+.deliveryDateMsk {
+  background-color: rgba(214, 166, 82, 0.2);
+  border-color: rgba(214, 166, 82, 0.4);
+  color: #7d5b18;
+  box-shadow: 0 10px 22px rgba(214, 166, 82, 0.16);
+}
+
+.deliveryDateSpb {
+  background-color: rgba(96, 125, 131, 0.16);
+  border-color: rgba(96, 125, 131, 0.36);
+  color: #3f555a;
+  box-shadow: 0 10px 22px rgba(96, 125, 131, 0.14);
 }
 
 .descriptionList {

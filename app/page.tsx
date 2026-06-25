@@ -25,10 +25,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [categories, homePage] = await Promise.all([
+  const [categories, homePage, siteSettings] = await Promise.all([
     getCategories(),
     getHomePage(),
+    getSiteSettings(),
   ]);
 
-  return <HomePageClient categories={categories} homePage={homePage} />;
+  return (
+    <HomePageClient
+      categories={categories}
+      homePage={homePage}
+      siteSettings={siteSettings}
+    />
+  );
 }

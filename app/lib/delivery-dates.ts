@@ -12,6 +12,7 @@ type DeliveryDateSettings = Pick<
 type DeliveryDateItem = {
   city: "СПб" | "Мск";
   date: string;
+  region: DeliveryRegion;
 };
 
 export type DeliveryRegion = "msk" | "spb";
@@ -28,8 +29,7 @@ export type DeliveryTimeIntervalOption = {
 
 const deliveryDateFormatter = new Intl.DateTimeFormat("ru-RU", {
   day: "numeric",
-  month: "long",
-  year: "numeric",
+  month: "numeric",
 });
 
 const getStrapiDateParts = (value?: string | null) => {
@@ -66,9 +66,7 @@ export const formatStrapiDate = (value?: string | null) => {
   return parts ? deliveryDateFormatter.format(parts.date) : null;
 };
 
-export const formatStrapiDateRange = (
-  range?: SiteDeliveryDateRange | null,
-) => {
+export const formatStrapiDateRange = (range?: SiteDeliveryDateRange | null) => {
   if (!range) {
     return null;
   }
@@ -77,7 +75,7 @@ export const formatStrapiDateRange = (
   const dateTo = formatStrapiDate(range.dateTo);
 
   if (dateFrom && dateTo) {
-    return `с ${dateFrom} по ${dateTo}`;
+    return `${dateFrom} - ${dateTo}`;
   }
 
   return dateFrom ?? dateTo;
@@ -90,10 +88,12 @@ export const getDeliveryDateItems = (
     {
       city: "Мск",
       date: formatStrapiDateRange(siteSettings.deliveryDateMsk),
+      region: "msk",
     },
     {
       city: "СПб",
       date: formatStrapiDateRange(siteSettings.deliveryDateSpb),
+      region: "spb",
     },
   ].filter((item): item is DeliveryDateItem => Boolean(item.date));
 
@@ -111,34 +111,26 @@ export const getDeliveryDateOptions = (
     return [];
   }
 
-  const startDate = from.date <= to.date ? from.date : to.date;
-  const endDate = from.date <= to.date ? to.date : from.date;
-  const options: DeliveryDateOption[] = [];
+  const uniqueOptions = new Map<string, DeliveryDateOption>();
 
-  for (
-    const date = new Date(startDate);
-    date <= endDate;
-    date.setDate(date.getDate() + 1)
-  ) {
+  [from, to].forEach(({ date, day, month, year }) => {
     const value = [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, "0"),
-      String(date.getDate()).padStart(2, "0"),
+      year,
+      String(month).padStart(2, "0"),
+      String(day).padStart(2, "0"),
     ].join("-");
 
-    options.push({
+    uniqueOptions.set(value, {
       label: deliveryDateFormatter.format(date),
       value,
     });
-  }
+  });
 
-  return options;
+  return Array.from(uniqueOptions.values());
 };
 
 const formatTime = (value: string) => {
-  const match = /^(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(
-    value.trim(),
-  );
+  const match = /^(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(value.trim());
 
   return match ? `${match[1]}:${match[2]}` : null;
 };

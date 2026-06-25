@@ -83,7 +83,22 @@ export const ProductPageClient = ({
         </div>
 
         <div className={styles.infoCard}>
-          <span className={styles.kicker}>Карточка товара</span>
+          {deliveryDates.length ? (
+            <div className={styles.deliveryDates}>
+              {deliveryDates.map((item) => (
+                <span
+                  key={item.region}
+                  className={`${styles.deliveryDate} ${
+                    item.region === "msk"
+                      ? styles.deliveryDateMsk
+                      : styles.deliveryDateSpb
+                  }`}
+                >
+                  {item.city}: {item.date}
+                </span>
+              ))}
+            </div>
+          ) : null}
           <div className={styles.titleBlock}>
             <h1 className={styles.name}>{product.name}</h1>
             {product.promoLabel || product.dietLabel || product.freezeLabel ? (
@@ -112,16 +127,6 @@ export const ProductPageClient = ({
             unitValue={product.unit.value}
             isOutOfStock={product.isOutOfStock}
           />
-
-          {deliveryDates.length ? (
-            <div className={styles.deliveryDates}>
-              {deliveryDates.map((item) => (
-                <span key={item.city} className={styles.deliveryDate}>
-                  {item.city}: {item.date}
-                </span>
-              ))}
-            </div>
-          ) : null}
 
           {/* <p className={styles.lead}>
             {product.description[0]?.text ??

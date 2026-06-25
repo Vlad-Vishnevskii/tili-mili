@@ -143,6 +143,10 @@
   opacity: 0.22;
 }
 
+.bannerOriginalImage .bannerMediaImage {
+  opacity: 1;
+}
+
 .bannerGlow {
   position: absolute;
   inset: auto -80px -120px auto;
@@ -154,6 +158,10 @@
     rgba(214, 166, 82, 0.52),
     transparent 70%
   );
+}
+
+.bannerOriginalImage .bannerGlow {
+  display: none;
 }
 
 .bannerContent {

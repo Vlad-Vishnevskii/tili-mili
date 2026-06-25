@@ -77,6 +77,7 @@ export type HomeHeroBanner = {
   meta: string[];
   imageUrl?: string;
   mobileImageUrl?: string;
+  blurBackground: boolean;
   buttons: HomeHeroButton[];
   isActive: boolean;
 };
@@ -609,6 +610,7 @@ const normalizeHeroBanners = (value: unknown): HomeHeroBanner[] => {
         ],
         imageUrl: extractMediaUrl(item.image) ?? undefined,
         mobileImageUrl: extractMediaUrl(item.mobileImage) ?? undefined,
+        blurBackground: getBoolean(item.blurBackground) ?? true,
         buttons: normalizeHeroButtons(item.buttons, item),
         isActive: getBoolean(item.isActive) ?? true,
       };

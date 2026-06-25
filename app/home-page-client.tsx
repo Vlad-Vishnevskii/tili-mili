@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import classnames from "classnames";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -33,6 +34,7 @@ type HeroSlideViewModel = {
   meta: string[];
   imageUrl?: string;
   mobileImageUrl?: string;
+  blurBackground: boolean;
   buttons: HeroButtonViewModel[];
 };
 
@@ -42,6 +44,7 @@ const fallbackSlides: HeroSlideViewModel[] = HERO_SLIDES.map((slide, index) => (
   text: slide.text,
   accent: slide.accent,
   meta: [...slide.meta],
+  blurBackground: true,
   buttons: [],
 }));
 
@@ -62,6 +65,7 @@ export default function HomePageClient({
         meta: banner.meta,
         imageUrl: banner.imageUrl,
         mobileImageUrl: banner.mobileImageUrl,
+        blurBackground: banner.blurBackground,
         buttons: banner.buttons,
       }))
     : fallbackSlides;
@@ -97,7 +101,11 @@ export default function HomePageClient({
         >
           {heroSlides.map((slide) => (
             <SwiperSlide className={styles.heroSlide} key={slide.id}>
-              <div className={styles.banner}>
+              <div
+                className={classnames(styles.banner, {
+                  [styles.bannerOriginalImage]: !slide.blurBackground,
+                })}
+              >
               {slide.imageUrl || slide.mobileImageUrl ? (
                 <picture className={styles.bannerMedia}>
                   {slide.mobileImageUrl ? (

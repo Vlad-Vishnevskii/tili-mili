@@ -12,7 +12,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { CATEGORY_CARD_COPY, HERO_SLIDES } from "./constants";
 import type { CatalogCategory } from "@/app/lib/catalog";
-import { getDeliveryDateItems } from "@/app/lib/delivery-dates";
 import type { HomePageData, SiteSettings } from "@/app/lib/site-data";
 import styles from "./page.module.css";
 
@@ -60,9 +59,7 @@ const isExternalHref = (href: string) => /^(https?:)?\/\//i.test(href);
 export default function HomePageClient({
   categories,
   homePage,
-  siteSettings,
 }: HomePageClientProps) {
-  const deliveryDates = getDeliveryDateItems(siteSettings);
   const heroSlides = homePage.heroBanners.length
     ? homePage.heroBanners.map((banner) => ({
         id: banner.id,

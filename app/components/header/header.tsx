@@ -22,8 +22,8 @@ import { useCart } from "@/app/providers/cart-provider";
 
 const DESKTOP_NAV_SCROLL_STEP = 280;
 const SEARCH_RESULTS_LIMIT = 8;
-const MOBILE_HEADER_COMPACT_ENTER_SCROLL_Y = 80;
-const MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y = 8;
+const HEADER_COMPACT_ENTER_SCROLL_Y = 80;
+const HEADER_COMPACT_EXIT_SCROLL_Y = 8;
 const DEFAULT_PHONE_NUMBER = "+79163672825";
 const DEFAULT_PROMO_TEXT = "Фермерские продукты из деревни";
 
@@ -39,38 +39,11 @@ type SearchResult = {
   title: string;
   subtitle: string;
   link: string;
-  type: "category" | "product";
+  type: "product";
 };
 
 const normalizeSearchValue = (value: string) =>
   value.toLowerCase().trim().replace(/\s+/g, " ");
-
-const getCategorySearchResults = (
-  categories: CatalogCategory[],
-  searchValue: string,
-): SearchResult[] =>
-  categories
-    .filter((category) => {
-      const haystack = normalizeSearchValue(
-        [
-          category.name,
-          category.slug,
-          ...category.subCategories.flatMap((item) => [
-            item.name,
-            item.slug ?? "",
-          ]),
-        ].join(" "),
-      );
-
-      return haystack.includes(searchValue);
-    })
-    .map((category) => ({
-      id: `category-${category.id}`,
-      title: category.name,
-      subtitle: "Категория",
-      link: category.link,
-      type: "category" as const,
-    }));
 
 const getProductSearchResults = (
   products: CatalogProduct[],
@@ -121,15 +94,15 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isMobileCompact, setIsMobileCompact] = useState(false);
+  const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const [isHeaderTransitioning, setIsHeaderTransitioning] = useState(false);
 
   const normalizedSearchValue = normalizeSearchValue(searchValue);
   const searchResults = normalizedSearchValue
-    ? [
-        ...getCategorySearchResults(categories, normalizedSearchValue),
-        ...getProductSearchResults(products, normalizedSearchValue),
-      ].slice(0, SEARCH_RESULTS_LIMIT)
+    ? getProductSearchResults(products, normalizedSearchValue).slice(
+        0,
+        SEARCH_RESULTS_LIMIT,
+      )
     : [];
   const isSearchDropdownOpen = Boolean(
     normalizedSearchValue && isSearchFocused,
@@ -183,7 +156,6 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
   const phoneHref = toPhoneHref(primaryPhone);
 
   useEffect(() => {
-    const mobileMedia = window.matchMedia("(max-width: 900px)");
     let animationFrameId = 0;
     let fadeOutTimeoutId = 0;
     let fadeInTimeoutId = 0;
@@ -206,7 +178,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
       fadeOutTimeoutId = window.setTimeout(() => {
         compactState = nextCompactState;
         transitionTarget = null;
-        setIsMobileCompact(nextCompactState);
+        setIsHeaderCompact(nextCompactState);
 
         fadeInTimeoutId = window.setTimeout(() => {
           setIsHeaderTransitioning(false);
@@ -214,42 +186,43 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
       }, 120);
     };
 
-    const updateMobileHeader = () => {
+    const updateHeader = () => {
       const scrollTop = Math.max(
         window.scrollY,
         document.documentElement.scrollTop,
         document.body.scrollTop,
       );
+      const effectiveCompactState = transitionTarget ?? compactState;
 
-      if (
-        mobileMedia.matches &&
-        scrollTop <= MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y
-      ) {
+      if (!effectiveCompactState && headerRef.current) {
+        const expandedHeight = `${headerRef.current.getBoundingClientRect().height}px`;
+
+        headerRef.current?.style.setProperty(
+          "--header-expanded-height",
+          expandedHeight,
+        );
         headerRef.current?.style.setProperty(
           "--mobile-header-expanded-height",
-          `${headerRef.current.getBoundingClientRect().height}px`,
+          expandedHeight,
         );
       }
 
-      const effectiveCompactState = transitionTarget ?? compactState;
-      const nextCompactState = mobileMedia.matches
-        ? effectiveCompactState
-          ? scrollTop > MOBILE_HEADER_COMPACT_EXIT_SCROLL_Y
-          : scrollTop > MOBILE_HEADER_COMPACT_ENTER_SCROLL_Y
-        : false;
+      const nextCompactState = effectiveCompactState
+        ? scrollTop > HEADER_COMPACT_EXIT_SCROLL_Y
+        : scrollTop > HEADER_COMPACT_ENTER_SCROLL_Y;
 
       transitionToCompactState(nextCompactState);
     };
 
     const handleScroll = () => {
       window.cancelAnimationFrame(animationFrameId);
-      animationFrameId = window.requestAnimationFrame(updateMobileHeader);
+      animationFrameId = window.requestAnimationFrame(updateHeader);
     };
 
-    updateMobileHeader();
+    updateHeader();
     window.addEventListener("scroll", handleScroll, { passive: true });
     document.body.addEventListener("scroll", handleScroll, { passive: true });
-    mobileMedia.addEventListener("change", updateMobileHeader);
+    window.addEventListener("resize", updateHeader);
 
     return () => {
       window.cancelAnimationFrame(animationFrameId);
@@ -257,7 +230,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
       window.clearTimeout(fadeInTimeoutId);
       window.removeEventListener("scroll", handleScroll);
       document.body.removeEventListener("scroll", handleScroll);
-      mobileMedia.removeEventListener("change", updateMobileHeader);
+      window.removeEventListener("resize", updateHeader);
     };
   }, []);
 
@@ -349,7 +322,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
     <header
       ref={headerRef}
       className={classnames(styles.wrapper, {
-        [styles.mobileCompact]: isMobileCompact,
+        [styles.mobileCompact]: isHeaderCompact,
         [styles.headerTransitioning]: isHeaderTransitioning,
       })}
     >
@@ -450,7 +423,7 @@ export const Header = ({ categories, products, siteSettings }: HeaderProps) => {
                             onClick={() => handleSearchNavigate(item.link)}
                           >
                             <span className={styles.searchResultType}>
-                              {item.type === "category" ? "Категория" : "Товар"}
+                              Товар
                             </span>
                             <strong>{item.title}</strong>
                             <span className={styles.searchResultSubtitle}>

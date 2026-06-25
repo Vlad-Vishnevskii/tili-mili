@@ -70,6 +70,9 @@
   gap: 10px;
   min-height: 40px;
   padding: 10px 16px;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
   border-radius: 14px;
   border: 1px solid rgba(214, 166, 82, 0.18);
   background:
